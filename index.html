@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bảng điều phối quân số</title>
+<style>
+:root{--bg:#eef0f3;--fg:#17202b;--mut:#5f6b7a;--card:#fff;--bd:#d5dae1;--btn:#1d4f91;--okb:#d9f2e3;--ok:#0f6b3f;--wab:#fbeec8;--wa:#7a4e00;--badb:#f9dada;--bad:#9b2323;--grb:#e4e7ec;--gr:#4a5563}
+@media(prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e6e9ee;--mut:#9aa5b4;--card:#1c222b;--bd:#313947;--btn:#2f6bc4;--okb:#12392a;--ok:#74dca3;--wab:#3b2f0f;--wa:#f0c565;--badb:#431c1c;--bad:#ff9d9d;--grb:#2a303b;--gr:#b6bfcc}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:12px}
+h1{font-size:1.4rem;margin:0 0 4px}h2{font-size:1.05rem;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px}
+.narrow{max-width:380px;margin:8vh auto 0}
+.mut{color:var(--mut);font-size:.88rem}
+.err{color:var(--bad);min-height:1.2em;margin:6px 0}
+label{display:block;margin:10px 0;font-size:.92rem}
+input,select,textarea{display:block;width:100%;margin-top:4px;padding:10px;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px}
+input[type=checkbox]{display:inline-block;width:auto;margin-right:6px}
+button{font:inherit;padding:9px 14px;border:0;border-radius:6px;background:var(--btn);color:#fff;cursor:pointer}
+button.sec{background:var(--grb);color:var(--fg);border:1px solid var(--bd)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #6ea2ff;outline-offset:1px}
+header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:12px}
+.act{display:flex;gap:6px;flex-wrap:wrap}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}
+.row:first-of-type{border-top:0}
+.r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.tag{font-size:.78rem;padding:1px 6px;border-radius:4px;background:var(--grb);color:var(--gr)}
+.st{font-size:.88rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--grb);color:var(--gr)}
+.ok{background:var(--okb);color:var(--ok)}.wa{background:var(--wab);color:var(--wa)}.bad{background:var(--badb);color:var(--bad)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1}nav button.on{background:var(--btn);color:#fff}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;z-index:5}
+.ov .card{width:100%;margin-top:8vh}
+.pin{font-size:2.4rem;letter-spacing:.3em;text-align:center;font-weight:700;margin:10px 0}
+#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#222;color:#fff;padding:9px 14px;border-radius:6px;display:none;z-index:9;max-width:90%}
+code{background:var(--grb);padding:1px 5px;border-radius:4px}
+</style></head><body>
+<main id="app"></main><div id="modal"></div><div id="toast"></div>
+<script>
+const API='https://ihrihhpovslcywzjtjtx.supabase.co/rest/v1/rpc/';
+const KEY='sb_publishable_a_pTZDIgAbLO4F2_usPJUw_d0dEgNSn';
+const ST=['Sẵn sàng','Trực ban','Tuần tra','Tiếp công dân','Giải quyết vụ việc','Công tác khác','Nghỉ phép/bù','Ốm','Học tập/công tác'];
+const DUTY={CH:'Chỉ huy',TB:'Trực ban',TC:'Trực chiến'};
+const ROLE={ad:'Quản trị',ch:'Chỉ huy',tb:'Trực ban',tc:'Trực chiến',off:'Không có ca trực hôm nay'};
+let S={code:'',pin:'',me:null,data:null,view:'board',timer:null};
+const $=s=>document.querySelector(s), app=$('#app');
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d?d.split('-').reverse().join('/'):'';
+const when=a=>a?new Date(a).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}):'';
+const cls=s=>['Sẵn sàng','Trực ban'].includes(s)?'ok':['Tuần tra','Tiếp công dân','Giải quyết vụ việc','Công tác khác'].includes(s)?'wa':['Nghỉ phép/bù','Ốm','Học tập/công tác'].includes(s)?'bad':'';
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500)}
+function closeM(){$('#modal').innerHTML=''}
+async function rpc(fn,a){
+  try{const r=await fetch(API+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(a)});
+    const j=await r.json();if(!r.ok)return{ok:false,msg:j.message||'Lỗi máy chủ'};return j}
+  catch(e){return{ok:false,msg:'Không kết nối được mạng'}}
+}
+const auth=()=>({p_code:S.code,p_pin:S.pin});
+
+/* ---- Đăng nhập ---- */
+function viewLogin(msg){
+  app.innerHTML=`<div class="card narrow"><h1>Bảng điều phối quân số</h1><p class="mut">Đăng nhập bằng mã cán bộ và PIN 4 số.</p>
+  <label>Mã cán bộ<input id="c" autocapitalize="characters" autocomplete="username" onkeydown="if(event.key==='Enter')$('#p').focus()"></label>
+  <label>PIN<input id="p" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></label>
+  <p class="err">${esc(msg||'')}</p><button onclick="doLogin()">Đăng nhập</button></div>`;
+}
+async function doLogin(){
+  const c=$('#c').value.trim().toUpperCase(),p=$('#p').value;
+  const r=await rpc('login',{p_code:c,p_pin:p});
+  if(!r.ok)return viewLogin(r.msg);
+  S.code=c;S.pin=p;S.me=r;r.must_change?viewChange():load();
+}
+function logout(){clearInterval(S.timer);S={code:'',pin:'',me:null,data:null,view:'board',timer:null};closeM();viewLogin()}
+
+/* ---- Đổi PIN ---- */
+function viewChange(msg){
+  const first=S.me&&S.me.must_change;
+  app.innerHTML=`<div class="card narrow"><h1>${first?'Đổi PIN lần đầu':'Đổi PIN'}</h1><p class="mut">PIN mới gồm 4 số, không dùng số lặp hoặc dễ đoán (0000, 1234).</p>
+  <label>PIN mới<input id="n1" type="password" inputmode="numeric" maxlength="4"></label>
+  <label>Nhập lại PIN mới<input id="n2" type="password" inputmode="numeric" maxlength="4" onkeydown="if(event.key==='Enter')doChange()"></label>
+  <p class="err">${esc(msg||'')}</p><div class="act"><button onclick="doChange()">Lưu PIN</button>${first?'':'<button class="sec" onclick="viewBoard()">Hủy</button>'}</div></div>`;
+}
+async function doChange(){
+  const a=$('#n1').value,b=$('#n2').value;
+  if(a!==b)return viewChange('Hai lần nhập chưa khớp');
+  const r=await rpc('change_pin',{...auth(),p_new:a});
+  if(!r.ok)return viewChange(r.msg);
+  S.pin=a;S.me.must_change=false;toast('Đã đổi PIN');load();
+}
+
+/* ---- Bảng điều phối ---- */
+async function load(){
+  const r=await rpc('board',auth());
+  if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
+  S.data=r;if(S.view==='board')viewBoard();
+  clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML)load()},30000);
+}
+function head(){
+  const d=S.data;
+  return `<header><div><b>${esc(d.label)}</b> (${esc(d.code)})<br><span class="mut">${ROLE[d.role]} · Ngày trực ${fmt(d.day)}</span></div>
+  <div class="act"><button class="sec" onclick="load()">Làm mới</button><button class="sec" onclick="viewChange()">Đổi PIN</button><button class="sec" onclick="logout()">Thoát</button></div></header>`+
+  (d.role==='ad'?`<nav><button class="${S.view==='board'?'on':'sec'}" onclick="S.view='board';viewBoard()">Bảng quân số</button><button class="${S.view==='admin'?'on':'sec'}" onclick="viewAdmin()">Quản trị</button></nav>`:'');
+}
+function viewBoard(){
+  S.view='board';const d=S.data,rows=d.rows,cnt={};
+  rows.forEach(r=>cnt[r.st]=(cnt[r.st]||0)+1);
+  let h=head();
+  h+=`<div class="card"><h2>Quân số trực: ${rows.length}</h2><div class="chips">${Object.keys(cnt).map(k=>`<span class="st ${cls(k)}">${esc(k)}: ${cnt[k]}</span>`).join('')}</div>${d.next?`<p class="mut">Ca trực tiếp theo của bạn: ${fmt(d.next)}</p>`:''}</div>`;
+  h+=`<div class="card">`+(rows.length?rows.map(r=>{
+    const can=r.code===d.code||d.role==='tb';
+    return `<div class="row"><div><b>${esc(r.label)}</b> <span class="tag">${DUTY[r.duty]||''}</span> <span class="tag">Ca ${esc(r.team)}</span>${r.code===d.code?' <span class="tag">Bạn</span>':''}
+    <div class="mut">${esc(r.code)}${r.area?' · '+esc(r.area):''}</div></div>
+    <div class="r"><span class="st ${cls(r.st)}">${esc(r.st)}</span><span class="mut">${when(r.at)}</span>${can?`<button class="sec" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}</div></div>`}).join('')
+    :`<p class="mut">Hôm nay chưa có lịch trực. Quản trị cần nhập lịch ở mục Quản trị.</p>`)+`</div>`;
+  if(d.log&&d.log.length)h+=`<div class="card"><h2>Hoạt động gần đây</h2>${d.log.map(l=>`<div class="row"><span>${esc(l.what)}</span><span class="mut">${when(l.at)}</span></div>`).join('')}</div>`;
+  app.innerHTML=h;
+}
+function edit(code){
+  const r=S.data.rows.find(x=>x.code===code);
+  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${esc(r.label)}</h2>
+  <label>Trạng thái<select id="es">${ST.map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select></label>
+  <label>Khu vực / ghi chú<input id="ea" maxlength="60" value="${esc(r.area||'')}"></label>
+  <p class="err" id="em"></p><div class="act"><button onclick="saveSt('${esc(code)}')">Lưu trạng thái</button><button class="sec" onclick="closeM()">Hủy</button></div></div></div>`;
+}
+async function saveSt(code){
+  const r=await rpc('set_status',{...auth(),p_target:code,p_st:$('#es').value,p_area:$('#ea').value.trim()});
+  if(!r.ok){$('#em').textContent=r.msg;return}
+  closeM();toast('Đã lưu');load();
+}
+
+/* ---- Quản trị ---- */
+async function viewAdmin(){
+  S.view='admin';
+  const r=await rpc('admin_list',auth());
+  if(!r.ok){toast(r.msg);S.view='board';return}
+  const opt=(v,t)=>`<option value="${v}">${t}</option>`;
+  app.innerHTML=head()+`<div class="card"><h2>Danh sách cán bộ (${r.officers.length})</h2>`+
+  r.officers.map(o=>`<div class="row"><div><b>${esc(o.code)}</b> ${esc(o.label)}<div class="mut">${o.kind}${o.team?' · Ca '+o.team:''}${o.active?'':' · Đã ngừng'}${o.locked?' · ĐANG KHÓA':''}${o.must_change?' · Chưa đổi PIN':''}</div></div>
+  <div class="act"><button class="sec" onclick='fillOff(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Sửa</button><button class="sec" onclick="resetPin('${esc(o.code)}')">Đặt lại PIN</button></div></div>`).join('')+`</div>
+  <div class="card"><h2>Thêm hoặc sửa cán bộ</h2>
+  <label>Mã (ví dụ CB07)<input id="oc" autocapitalize="characters"></label>
+  <label>Tên hiển thị<input id="ol"></label>
+  <label>Loại<select id="ok">${opt('CB','CB: Cán bộ')+opt('CH','CH: Chỉ huy')+opt('QT','QT: Quản trị')}</select></label>
+  <label>Ca mặc định<select id="ot">${opt('','Không có')+opt('A','Ca A')+opt('B','Ca B')+opt('C','Ca C')}</select></label>
+  <label><input type="checkbox" id="oa" checked>Đang hoạt động</label>
+  <p class="mut">Mã mới sẽ được cấp PIN tạm ngẫu nhiên, hiện một lần duy nhất.</p>
+  <button onclick="saveOff()">Lưu cán bộ</button></div>
+  <div class="card"><h2>Nhập lịch trực</h2>
+  <p class="mut">Mỗi dòng một người: <code>ngày,ca,mã,nhiệm vụ</code>. Ví dụ <code>2026-11-14,A,CB06,TB</code>. Nhiệm vụ: CH (chỉ huy), TB (trực ban), TC (trực chiến). Ngày nào có trong dữ liệu sẽ được thay mới hoàn toàn.</p>
+  <textarea id="im" rows="8" placeholder="2026-11-14,A,CB01,CH"></textarea>
+  <p class="err" id="ie"></p><button onclick="doImport()">Nhập lịch</button></div>`;
+}
+function fillOff(o){$('#oc').value=o.code;$('#ol').value=o.label;$('#ok').value=o.kind;$('#ot').value=o.team||'';$('#oa').checked=o.active;$('#oc').scrollIntoView({behavior:'smooth'})}
+function pinBox(title,code,pin){
+  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${esc(title)} ${esc(code)}</h2><div class="pin">${esc(pin)}</div><p class="mut">Ghi lại và gửi riêng cho cán bộ. PIN này chỉ hiện một lần, người dùng sẽ phải đổi ngay khi đăng nhập.</p><button onclick="closeM()">Đã ghi lại</button></div></div>`;
+}
+async function saveOff(){
+  const code=$('#oc').value.trim().toUpperCase();
+  if(!code||!$('#ol').value.trim())return toast('Cần nhập mã và tên');
+  const r=await rpc('admin_save_officer',{...auth(),o_code:code,o_label:$('#ol').value.trim(),o_kind:$('#ok').value,o_team:$('#ot').value,o_active:$('#oa').checked});
+  if(!r.ok)return toast(r.msg);
+  if(r.pin)pinBox('PIN tạm của',code,r.pin);else toast('Đã lưu');
+  viewAdmin();
+}
+async function resetPin(code){
+  if(!confirm('Đặt lại PIN cho '+code+'?'))return;
+  const r=await rpc('admin_reset_pin',{...auth(),o_code:code});
+  if(!r.ok)return toast(r.msg);
+  pinBox('PIN tạm mới của',code,r.pin);viewAdmin();
+}
+async function doImport(){
+  const rows=[];let bad='';
+  $('#im').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach((l,i)=>{
+    const p=l.split(/[,;\t]/).map(x=>x.trim());
+    if(i===0&&!/^\d{4}-\d{2}-\d{2}$/.test(p[0]))return;
+    if(p.length<4||!/^\d{4}-\d{2}-\d{2}$/.test(p[0])||!['A','B','C'].includes(p[1].toUpperCase())||!['CH','TB','TC'].includes(p[3].toUpperCase()))bad=bad||'Dòng sai: '+l;
+    else rows.push({day:p[0],team:p[1],code:p[2],duty:p[3]});
+  });
+  if(bad)return $('#ie').textContent=bad;
+  if(!rows.length)return $('#ie').textContent='Chưa có dòng nào';
+  const r=await rpc('admin_import',{...auth(),p_rows:rows});
+  if(!r.ok)return $('#ie').textContent=r.msg;
+  $('#ie').textContent='';toast('Đã nhập '+r.n+' dòng lịch');$('#im').value='';
+}
+viewLogin();
+</script></body></html>

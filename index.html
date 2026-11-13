@@ -2,39 +2,59 @@
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Bảng điều phối quân số</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
 <style>
-:root{--bg:#eef0f3;--fg:#17202b;--mut:#5f6b7a;--card:#fff;--bd:#d5dae1;--btn:#1d4f91;--okb:#d9f2e3;--ok:#0f6b3f;--wab:#fbeec8;--wa:#7a4e00;--badb:#f9dada;--bad:#9b2323;--grb:#e4e7ec;--gr:#4a5563}
-@media(prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e6e9ee;--mut:#9aa5b4;--card:#1c222b;--bd:#313947;--btn:#2f6bc4;--okb:#12392a;--ok:#74dca3;--wab:#3b2f0f;--wa:#f0c565;--badb:#431c1c;--bad:#ff9d9d;--grb:#2a303b;--gr:#b6bfcc}}
+:root{--bg:#eaf3ff;--fg:#14233b;--mut:#5b6b82;--card:#fff;--bd:#d3e2f6;--p1:#1769e0;--p2:#10b3a3;--btn:#1769e0;--sunb:#ffe28a;--sun:#5a4300;--tbb:#d9e8ff;--tb:#0f4fb8;--okb:#d6f5e2;--ok:#0b7a3c;--wab:#ffe9bf;--wa:#8a4b00;--badb:#ffdada;--bad:#b3202a;--grb:#e4ecf8;--gr:#43536b;--sh:0 4px 14px rgba(23,105,224,.12)}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1526;--fg:#e8eefb;--mut:#9fb0c9;--card:#17223a;--bd:#2a3a5a;--p1:#2f78e6;--p2:#12a89a;--btn:#2f78e6;--sunb:#4a3a08;--sun:#ffd95a;--tbb:#1c3560;--tb:#9cc4ff;--okb:#123a28;--ok:#7be0a8;--wab:#3d2e0c;--wa:#f5c86a;--badb:#431b1f;--bad:#ff9fa5;--grb:#243252;--gr:#b7c4da;--sh:0 4px 14px rgba(0,0,0,.35)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 "Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif}
 main{max-width:760px;margin:0 auto;padding:12px}
-h1{font-size:1.4rem;margin:0 0 4px}h2{font-size:1.05rem;margin:0 0 10px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px}
-.narrow{max-width:380px;margin:8vh auto 0}
+h1{font-size:1.45rem;margin:0 0 4px;font-weight:800}h2{font-size:1.05rem;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.narrow{max-width:400px;margin:5vh auto 0}
+.login{padding:0;overflow:hidden}.login .in{padding:6px 16px 16px}
+.hero{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;text-align:center;padding:26px 16px 22px}
+.hero .logo{font-size:3rem;line-height:1;margin-bottom:6px}.hero h1{color:#fff}.hero p{margin:0;opacity:.92;font-size:.92rem}
 .mut{color:var(--mut);font-size:.88rem}
-.err{color:var(--bad);min-height:1.2em;margin:6px 0}
-label{display:block;margin:10px 0;font-size:.92rem}
-input,select,textarea{display:block;width:100%;margin-top:4px;padding:10px;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px}
+.err{color:var(--bad);min-height:1.2em;margin:6px 0;font-weight:600}
+label{display:block;margin:10px 0;font-size:.92rem;font-weight:600}
+input,select,textarea{display:block;width:100%;margin-top:4px;padding:11px;font:inherit;font-weight:400;color:var(--fg);background:var(--bg);border:2px solid var(--bd);border-radius:12px}
 input[type=checkbox]{display:inline-block;width:auto;margin-right:6px}
-button{font:inherit;padding:9px 14px;border:0;border-radius:6px;background:var(--btn);color:#fff;cursor:pointer}
-button.sec{background:var(--grb);color:var(--fg);border:1px solid var(--bd)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #6ea2ff;outline-offset:1px}
-header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:12px}
+button{font:inherit;font-weight:600;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(120deg,var(--p1),var(--p2));color:#fff;cursor:pointer;box-shadow:0 3px 8px rgba(23,105,224,.25)}
+button:active{transform:scale(.97)}
+button.sec{background:var(--card);color:var(--btn);border:2px solid var(--bd);box-shadow:none}
+button.sm{padding:6px 14px;font-size:.85rem}
+button.gl{background:rgba(255,255,255,.22);box-shadow:none;padding:7px 13px;font-size:.85rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--sunb);outline-offset:1px;border-color:var(--p1)}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;padding:14px;border-radius:18px;color:#fff;background:linear-gradient(120deg,var(--p1),var(--p2));box-shadow:var(--sh)}
+.who{display:flex;gap:10px;align-items:center}.who .sub,.day{font-size:.85rem;opacity:.92}.day{text-align:right}
 .act{display:flex;gap:6px;flex-wrap:wrap}
+.av{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:#fff;background:#6b7a90;border:2px solid rgba(255,255,255,.7)}
+.tA{background:#1769e0}.tB{background:#0fa37f}.tC{background:#f08a00}
 .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}
 .row:first-of-type{border-top:0}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tile{flex:1 1 92px;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--bd);font-size:.85rem;font-weight:600}
+.tile .num{font-size:1.8rem;font-weight:800;line-height:1.1}
+.tile.big{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border:0}
+.tile.s-ok{background:var(--okb);color:var(--ok);border:0}.tile.s-wa{background:var(--wab);color:var(--wa);border:0}.tile.s-bad{background:var(--badb);color:var(--bad);border:0}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--bd);border-left:6px solid #8a98ad;border-radius:16px;padding:12px;margin-bottom:10px;box-shadow:var(--sh)}
+.item.s-ok{border-left-color:#14a44d}.item.s-wa{border-left-color:#f59e0b}.item.s-bad{border-left-color:#e5484d}
+.mid{flex:1;min-width:0}.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.area{margin-top:4px;font-size:.9rem;font-weight:600;color:var(--p1)}
+.me{font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--sunb);color:var(--sun)}
+.dt{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--grb);color:var(--gr)}
+.dCH{background:var(--sunb);color:var(--sun)}.dTB{background:var(--tbb);color:var(--tb)}
 .r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.tag{font-size:.78rem;padding:1px 6px;border-radius:4px;background:var(--grb);color:var(--gr)}
-.st{font-size:.88rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--grb);color:var(--gr)}
-.ok{background:var(--okb);color:var(--ok)}.wa{background:var(--wab);color:var(--wa)}.bad{background:var(--badb);color:var(--bad)}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-nav{display:flex;gap:6px;margin-bottom:12px}
-nav button{flex:1}nav button.on{background:var(--btn);color:#fff}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;z-index:5}
-.ov .card{width:100%;margin-top:8vh}
-.pin{font-size:2.4rem;letter-spacing:.3em;text-align:center;font-weight:700;margin:10px 0}
-#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#222;color:#fff;padding:9px 14px;border-radius:6px;display:none;z-index:9;max-width:90%}
-code{background:var(--grb);padding:1px 5px;border-radius:4px}
+.st{font-size:.85rem;font-weight:700;padding:3px 11px;border-radius:999px;background:var(--grb);color:var(--gr)}
+.st.ok{background:var(--okb);color:var(--ok)}.st.wa{background:var(--wab);color:var(--wa)}.st.bad{background:var(--badb);color:var(--bad)}
+nav{display:flex;gap:8px;margin-bottom:12px}
+nav button{flex:1}nav button.on{box-shadow:0 3px 10px rgba(23,105,224,.35)}
+.ov{position:fixed;inset:0;background:rgba(10,20,40,.6);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;z-index:5}
+.ov .card{width:100%;max-width:420px;margin-top:8vh}
+.pin{font-size:2.4rem;letter-spacing:.3em;text-align:center;font-weight:800;margin:10px 0;color:var(--p1)}
+#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#14233b;color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:9;max-width:90%;font-weight:600}
+code{background:var(--grb);padding:1px 6px;border-radius:6px}
 </style></head><body>
 <main id="app"></main><div id="modal"></div><div id="toast"></div>
 <script>
@@ -60,10 +80,10 @@ const auth=()=>({p_code:S.code,p_pin:S.pin});
 
 /* ---- Đăng nhập ---- */
 function viewLogin(msg){
-  app.innerHTML=`<div class="card narrow"><h1>Bảng điều phối quân số</h1><p class="mut">Đăng nhập bằng mã cán bộ và PIN 4 số.</p>
-  <label>Mã cán bộ<input id="c" autocapitalize="characters" autocomplete="username" onkeydown="if(event.key==='Enter')$('#p').focus()"></label>
-  <label>PIN<input id="p" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></label>
-  <p class="err">${esc(msg||'')}</p><button onclick="doLogin()">Đăng nhập</button></div>`;
+  app.innerHTML=`<div class="card narrow login"><div class="hero"><div class="logo">🛡️</div><h1>Bảng điều phối quân số</h1><p>Cập nhật trạng thái trực nhanh, mọi người cùng thấy</p></div><div class="in">
+  <label>Mã cán bộ<input id="c" autocapitalize="characters" autocomplete="username" placeholder="Ví dụ CB07" onkeydown="if(event.key==='Enter')$('#p').focus()"></label>
+  <label>PIN 4 số<input id="p" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></label>
+  <p class="err">${esc(msg||'')}</p><button style="width:100%" onclick="doLogin()">Đăng nhập</button></div></div>`;
 }
 async function doLogin(){
   const c=$('#c').value.trim().toUpperCase(),p=$('#p').value;
@@ -97,23 +117,29 @@ async function load(){
   S.data=r;if(S.view==='board')viewBoard();
   clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML)load()},30000);
 }
+const ini=l=>((String(l||'?').trim().split(/\s+/).pop())||'?').charAt(0).toUpperCase();
+const sc=c=>c?'s-'+c:'';
 function head(){
   const d=S.data;
-  return `<header><div><b>${esc(d.label)}</b> (${esc(d.code)})<br><span class="mut">${ROLE[d.role]} · Ngày trực ${fmt(d.day)}</span></div>
-  <div class="act"><button class="sec" onclick="load()">Làm mới</button><button class="sec" onclick="viewChange()">Đổi PIN</button><button class="sec" onclick="logout()">Thoát</button></div></header>`+
-  (d.role==='ad'?`<nav><button class="${S.view==='board'?'on':'sec'}" onclick="S.view='board';viewBoard()">Bảng quân số</button><button class="${S.view==='admin'?'on':'sec'}" onclick="viewAdmin()">Quản trị</button></nav>`:'');
+  return `<header class="top"><div class="who"><div class="av t${esc(d.team||'')}">${esc(ini(d.label))}</div><div><b>${esc(d.label)}</b><div class="sub">${esc(d.code)} · ${ROLE[d.role]}</div></div></div>
+  <div class="day">Ngày trực<br><b>${fmt(d.day)}</b></div>
+  <div class="act"><button class="gl" onclick="load()">Làm mới</button><button class="gl" onclick="viewChange()">Đổi PIN</button><button class="gl" onclick="logout()">Thoát</button></div></header>`+
+  (d.role==='ad'?`<nav><button class="${S.view==='board'?'':'sec'}" onclick="S.view='board';viewBoard()">Bảng quân số</button><button class="${S.view==='admin'?'':'sec'}" onclick="viewAdmin()">Quản trị</button></nav>`:'');
 }
 function viewBoard(){
   S.view='board';const d=S.data,rows=d.rows,cnt={};
   rows.forEach(r=>cnt[r.st]=(cnt[r.st]||0)+1);
   let h=head();
-  h+=`<div class="card"><h2>Quân số trực: ${rows.length}</h2><div class="chips">${Object.keys(cnt).map(k=>`<span class="st ${cls(k)}">${esc(k)}: ${cnt[k]}</span>`).join('')}</div>${d.next?`<p class="mut">Ca trực tiếp theo của bạn: ${fmt(d.next)}</p>`:''}</div>`;
-  h+=`<div class="card">`+(rows.length?rows.map(r=>{
-    const can=r.code===d.code||d.role==='tb';
-    return `<div class="row"><div><b>${esc(r.label)}</b> <span class="tag">${DUTY[r.duty]||''}</span> <span class="tag">Ca ${esc(r.team)}</span>${r.code===d.code?' <span class="tag">Bạn</span>':''}
-    <div class="mut">${esc(r.code)}${r.area?' · '+esc(r.area):''}</div></div>
-    <div class="r"><span class="st ${cls(r.st)}">${esc(r.st)}</span><span class="mut">${when(r.at)}</span>${can?`<button class="sec" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}</div></div>`}).join('')
-    :`<p class="mut">Hôm nay chưa có lịch trực. Quản trị cần nhập lịch ở mục Quản trị.</p>`)+`</div>`;
+  h+=`<div class="tiles"><div class="tile big"><span class="num">${rows.length}</span>Quân số trực</div>${Object.keys(cnt).map(k=>`<div class="tile ${sc(cls(k))}"><span class="num">${cnt[k]}</span>${esc(k)}</div>`).join('')}</div>`;
+  if(d.next)h+=`<p class="mut">Ca trực tiếp theo của bạn: <b>${fmt(d.next)}</b></p>`;
+  h+=rows.length?rows.map(r=>{
+    const can=r.code===d.code||d.role==='tb',c=cls(r.st);
+    return `<div class="item ${sc(c)}"><div class="av t${esc(r.team)}">${esc(ini(r.label))}</div>
+    <div class="mid"><b>${esc(r.label)}</b>${r.code===d.code?' <span class="me">Bạn</span>':''}
+    <div class="meta"><span class="dt d${esc(r.duty)}">${DUTY[r.duty]||''}</span><span class="mut">${esc(r.code)} · Ca ${esc(r.team)}</span></div>
+    ${r.area?`<div class="area">📍 ${esc(r.area)}</div>`:''}</div>
+    <div class="r"><span class="st ${c}">${esc(r.st)}</span><span class="mut">${when(r.at)}</span>${can?`<button class="sm" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}</div></div>`}).join('')
+    :`<div class="card"><p class="mut">Hôm nay chưa có lịch trực. Quản trị cần nhập lịch ở mục Quản trị.</p></div>`;
   if(d.log&&d.log.length)h+=`<div class="card"><h2>Hoạt động gần đây</h2>${d.log.map(l=>`<div class="row"><span>${esc(l.what)}</span><span class="mut">${when(l.at)}</span></div>`).join('')}</div>`;
   app.innerHTML=h;
 }

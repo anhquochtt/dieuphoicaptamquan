@@ -317,6 +317,12 @@ nav button.active{
 .area{margin-top:4px;font-size:.78rem;font-weight:600;color:var(--primary-blue)}
 .me{font-size:.68rem;font-weight:700;padding:2px 6px;border-radius:6px;background:#EFF6FF;color:var(--primary-blue)}
 .dt{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:6px;background:#F1F5F9;color:var(--text-secondary)}
+.zl{background:#0068FF;font-weight:800;font-size:.8rem;box-shadow:0 4px 10px rgba(0,104,255,.3)}
+nav button{padding:8px 4px;font-size:.78rem;white-space:nowrap}
+.call{width:32px;height:32px;border-radius:50%;background:#10B981;color:#FFF;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 10px rgba(16,185,129,.3)}
+.call:active{transform:scale(.94)}
+.rowb{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:4px}
+.ph{font-size:.72rem;color:var(--text-muted);margin-top:2px}
 .st-badge{
   display:inline-flex;
   align-items:center;
@@ -348,7 +354,7 @@ const ST=['Sẵn sàng','Trực ban','Tuần tra','Tiếp công dân','Giải qu
 const DUTY={CH:'Chỉ huy',TB:'Trực ban',TC:'Trực chiến'};
 const KIND={CB:'Cán bộ',CH:'Chỉ huy',TR:'Trưởng CA',QT:'Quản trị'};
 const TEAM0='A';
-let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',swapRequests:[]};
+let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[]};
 
 const $=s=>document.querySelector(s), app=$('#app');
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -376,6 +382,7 @@ const SICON={
   'Chưa cập nhật': svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>')
 };
 
+const PHONE=svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',16);
 const NU='Chưa cập nhật',PROOF=['Công tác khác','Học tập/công tác'];
 const col=s=>SCOL[s]||'#64748B';
 const icon=s=>SICON[s]||SICON[NU];
@@ -439,7 +446,7 @@ async function doLogin(){
 
 function logout(){
   clearInterval(S.timer);
-  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',swapRequests:[]};
+  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[]};
   closeM();
   viewLogin();
 }
@@ -474,9 +481,12 @@ async function load(){
   if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
   if(!S.areasOk){const a=await rpc('get_areas',auth());if(a.ok){S.areas=a.areas;S.areasOk=true}}
   if(r.kind==='TR'){const o=await rpc('tr_overview',{...auth(),p_day:null});if(o.ok)r.log=o.log.slice(0,12)}
+  const [sb,ph]=await Promise.all([rpc('swap_board',auth()),(S.phonesDay!==r.day||S.phonesStale)?rpc('get_phones',auth()):null]);
+  S.sw=sb.ok?sb:{incoming:[],mine:[],notices:[],can_cancel:false};
+  if(ph&&ph.ok){S.phones=ph.phones||{};S.phonesDay=r.day;S.phonesStale=0}
   S.data=r;if(r.role==='ad'){const a=await rpc('admin_list',auth());if(a.ok)S.locked=a.officers.filter(o=>o.locked)}
-  if(S.view==='board')viewBoard();else if(S.view==='ov')viewOverview(S.ovDay);
-  clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML)load()},30000);
+  const vf={board:viewBoard,ov:()=>viewOverview(S.ovDay),mine:viewMine,stats:viewStats}[S.view];if(vf)vf();showIncoming();
+  clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML&&document.activeElement.id!=='q')load()},30000);
 }
 
 const ini=l=>((String(l||'?').trim().split(/\s+/).pop())||'?').charAt(0).toUpperCase();
@@ -498,30 +508,23 @@ function renderHeader(){
   `;
 }
 
+function go(v){S.view=v;({board:viewBoard,ov:()=>viewOverview(),mine:viewMine,stats:viewStats,admin:viewAdmin})[v]()}
 function renderNav(){
-  const d=S.data;
-  if(d.role==='ad'){
-    return `<nav>
-      <button class="${S.view==='board'?'active':''}" onclick="S.view='board';viewBoard()">Quân số</button>
-      <button class="${S.view==='admin'?'active':''}" onclick="viewAdmin()">Quản trị</button>
-    </nav>`;
-  }
-  if(d.kind==='TR'){
-    return `<nav>
-      <button class="${S.view==='board'?'active':''}" onclick="S.view='board';viewBoard()">Hôm nay</button>
-      <button class="${S.view==='ov'?'active':''}" onclick="viewOverview()">Các ngày</button>
-    </nav>`;
-  }
-  return '';
+  const d=S.data,t=[['board',d.kind==='TR'?'Hôm nay':'Quân số']];
+  if(d.kind==='TR')t.push(['ov','Các ngày']);
+  if(d.kind!=='QT')t.push(['mine','Lịch của tôi']);
+  if(['CH','TR','QT'].includes(d.kind))t.push(['stats','Thống kê']);
+  if(d.role==='ad')t.push(['admin','Quản trị']);
+  return t.length<2?'':`<nav>${t.map(([v,l])=>`<button class="${S.view===v?'active':''}" onclick="go('${v}')">${l}</button>`).join('')}</nav>`;
 }
 
 function setF(k){S.filter=S.filter===k?'':k;viewBoard()}
 function setG(k){S.group=k;viewBoard()}
 
 function item(r){
-  const d=S.data,can=r.code===d.code||d.role==='tb',nu=r.st===NU;
+  const d=S.data,can=r.code===d.code||d.role==='tb',nu=r.st===NU,tel=r.code!==d.code?(S.phones[r.code]||''):'';
   return `
-    <div class="item ${nu?'nu':''}">
+    <div class="item ${nu?'nu':''}" data-s="${esc(norm(r.label+' '+r.code))}">
       <div class="av" style="background:${col(r.st)}">${esc(ini(r.label))}</div>
       <div class="mid">
         <b>${esc(r.label)} ${r.code===d.code?'<span class="me">Bạn</span>':''}</b>
@@ -536,7 +539,10 @@ function item(r){
           ${icon(r.st)} ${esc(r.st)}
         </div>
         <div class="mut" style="font-size:.7rem;margin-top:2px">${when(r.at)}</div>
-        ${can?`<button class="sm pill sec" style="margin-top:4px" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}
+        <div class="rowb">
+          ${tel?`<a class="call" href="tel:${esc(tel)}" title="Gọi ${esc(r.label)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" title="Zalo ${esc(r.label)}" aria-label="Zalo ${esc(r.label)}">Z</a>`:''}
+          ${can?`<button class="sm pill sec" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}
+        </div>
       </div>
     </div>
   `;
@@ -555,17 +561,12 @@ function viewBoard(){
     h += `<div class="alert"><span>Bạn đang ${esc(me.st)}. Gửi minh chứng cho trực ban.</span><button class="sm pill" onclick="proof()">Gửi Zalo</button></div>`;
   }
   
-  // Trực ban chỉ xem thông báo các ca đổi trực đã xác nhận (không có nút duyệt)
-  const pendingSwaps = S.swapRequests.filter(s=>s.status==='pending');
-  if(d.role==='tb' && pendingSwaps.length > 0){
-    h += `<div class="alert" style="background:#EFF6FF;color:#1E40AF;border-color:#DBEAFE">
-      <span>Có <b>${pendingSwaps.length}</b> ca đổi trực đã xác nhận (chờ Chỉ huy duyệt).</span>
-      <button class="sm pill" style="background:#2563EB;color:#FFF" onclick="openSwapApprovals()">Xem danh sách</button>
-    </div>`;
-  }
+  h += swCards();
 
-  if((['tb','ch','ad'].includes(d.role)||d.kind==='TR')&&nu.length){
-    h += `<div class="alert"><span>${nu.length} cán bộ chưa khai báo.</span><button class="sm pill" onclick="nudge()">Nhắc Zalo</button></div>`;
+  if((['tb','ch','ad'].includes(d.role)||d.kind==='TR')&&rows.length){
+    h += nu.length
+      ? `<div class="alert"><span>${nu.length} cán bộ chưa khai báo.</span><button class="sm pill" onclick="nudge()">Nhắc cả ca</button><button class="sm pill sec" onclick="report()">Báo cáo</button></div>`
+      : `<div class="alert" style="background:#ECFDF5;color:#047857;border-color:#D1FAE5"><span>Cả ca đã khai báo đủ.</span><button class="sm pill" onclick="nudge()">Gửi tổng hợp</button><button class="sm pill sec" onclick="report()">Báo cáo</button></div>`;
   }
 
   h += `<div class="card" style="padding-bottom:12px">
@@ -591,7 +592,7 @@ function viewBoard(){
     h += `<div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <h2>Cập nhật trạng thái</h2>
-        <button class="sec sm pill" onclick="openSwapModal()">Đổi trực với đồng nghiệp</button>
+        <button class="sec sm pill" onclick="openSwap()">Đổi trực</button>
       </div>
       <div class="qg">
         ${ST.map(s=>`
@@ -616,6 +617,7 @@ function viewBoard(){
     ${f?`<button class="sm" onclick="setF('')">Bỏ lọc ✕</button>`:''}
   </div>`;
 
+  h += `<input type="search" id="q" placeholder="Tìm theo tên hoặc mã" value="${esc(S.q)}" oninput="setQ(this.value)" style="margin:0 0 8px">`;
   const list=rows.filter(r=>!f||r.st===f);
   const gk=r=>S.group==='area'?(r.area||'Chưa ghi địa bàn'):S.group==='st'?r.st:DUTY[r.duty];
   const g={};
@@ -626,96 +628,153 @@ function viewBoard(){
     ${g[k].map(item).join('')}
   `).join('') : `<div class="card"><p class="mut">Hôm nay chưa có lịch trực.</p></div>`;
 
-  app.innerHTML = h;
+  app.innerHTML = h;if(S.q)applyQ();
 }
 
-function openSwapModal(){
-  const d=S.data, others=d.rows.filter(r=>r.code!==d.code);
-  $('#modal').innerHTML=`<div class="ov"><div class="card">
-    <h2>Đề nghị đổi trực ca</h2>
-    <p class="mut">Chọn đồng nghiệp bạn muốn đổi ca trực trong ngày hôm nay (${fmt(d.day)}).</p>
-    
-    <label class="mut" style="margin-top:10px;display:block">Đổi với cán bộ</label>
-    <select id="sw_target">
-      ${others.map(o=>`<option value="${o.code}">${esc(o.label)} (${DUTY[o.duty]||o.duty})</option>`).join('')}
-    </select>
-
-    <label class="mut" style="margin-top:10px;display:block">Lý do đổi trực</label>
-    <input id="sw_reason" placeholder="Ví dụ: Có việc gia đình đột xuất">
-
-    <div class="act" style="margin-top:16px">
-      <button style="flex:1" onclick="submitSwapRequest()">Gửi yêu cầu cho B</button>
-      <button class="sec" onclick="closeM()">Hủy</button>
-    </div>
-  </div></div>`;
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+function setQ(v){S.q=v;applyQ()}
+function applyQ(){
+  const q=norm(S.q).trim();
+  document.querySelectorAll('.item[data-s]').forEach(e=>e.style.display=!q||e.dataset.s.includes(q)?'':'none');
+  document.querySelectorAll('.gh').forEach(g=>{let n=g.nextElementSibling,any=false;while(n&&!n.classList.contains('gh')){if(n.dataset.s!==undefined&&n.style.display!=='none')any=true;n=n.nextElementSibling}g.style.display=any?'':'none'});
+}
+async function shareText(msg,okm){
+  if(navigator.share){try{await navigator.share({text:msg});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(msg);toast(okm||'Đã chép, dán vào Zalo')}catch(e){toast('Hãy tự chép nội dung vào Zalo')}
+}
+function report(){
+  const d=S.data,rows=d.rows,nu=rows.filter(r=>r.st===NU).length;
+  let m=`BÁO CÁO QUÂN SỐ TRỰC ${fmt(d.day)} (lúc ${nowT()})\nTổng: ${rows.length} người, chưa khai báo: ${nu}.`;
+  ['CH','TB','TC'].forEach(k=>{const L=rows.filter(r=>r.duty===k);if(L.length)m+=`\n${DUTY[k]} (${L.length}):`+L.map(r=>`\n- ${r.label} (${r.code}): ${r.st}${r.area?' - '+r.area:''}`).join('')});
+  shareText(m,'Đã chép báo cáo, dán vào Zalo');
 }
 
-function submitSwapRequest(){
-  const targetCode=$('#sw_target').value, reason=$('#sw_reason').value.trim();
-  const targetObj=S.data.rows.find(r=>r.code===targetCode);
-  const meObj=S.data.rows.find(r=>r.code===S.data.code);
-  
-  if(!reason)return toast('Vui lòng nhập lý do đổi trực');
+const SWST={wait:'Chờ trả lời',done:'Đã đổi',declined:'Bị từ chối',cancelled:'Đã hủy'};
+function swText(w){
+  const f=esc(w.from_label),t=esc(w.to_label);
+  if(w.kind==='DV')return `<b>${f}</b> đổi vai với <b>${t}</b> ngày ${fmt(w.day_from)}: ${f} sang trực chiến, ${t} sang trực ban`;
+  if(w.kind==='NC')return `<b>${f}</b> nhượng ca ${fmt(w.day_from)} (${DUTY[w.duty_from]||''}) cho <b>${t}</b>`;
+  return `<b>${f}</b> đổi ca ${fmt(w.day_from)} lấy ca ${fmt(w.day_to)} của <b>${t}</b>`;
+}
+function swCards(){
+  const s=S.sw;let h='';
+  if(s.incoming.length)h+=`<div class="alert" style="background:#EFF6FF;color:#1E40AF;border-color:#DBEAFE"><span>${s.incoming.length} yêu cầu đổi trực đang chờ bạn trả lời.</span><button class="sm pill" style="background:#2563EB" onclick="showIncoming(true)">Xem</button></div>`;
+  if(s.notices.length)h+=`<div class="card"><h2>Đổi trực gần đây</h2>${s.notices.map(w=>`<div style="padding:8px 0;border-top:1px solid var(--border);font-size:.82rem">${swText(w)}${w.status==='cancelled'?' <span class="me" style="background:#FEF2F2;color:#DC2626">Đã hủy</span>':''}${w.reason?`<div class="mut">Lý do: ${esc(w.reason)}</div>`:''}${s.can_cancel&&w.status==='done'?`<div><button class="sm pill sec" style="margin-top:6px" onclick="cancelSwap(${w.id})">Hủy đổi</button></div>`:''}</div>`).join('')}</div>`;
+  return h;
+}
+function showIncoming(force){
+  const L=S.sw.incoming.filter(w=>force||!S.seen[w.id]);
+  if(!L.length||($('#modal').innerHTML&&!force))return;
+  L.forEach(w=>S.seen[w.id]=1);
+  $('#modal').innerHTML=`<div class="ov"><div class="card" style="max-height:90vh;overflow:auto"><h2>Yêu cầu đổi trực</h2>${L.map(w=>`<div style="background:#F8FAFC;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border)">${swText(w)}<div class="mut">Lý do: ${esc(w.reason||'không ghi')}</div><div class="act" style="margin-top:8px"><button class="sm" onclick="answerSwap(${w.id},true)">Đồng ý</button><button class="sm sec" onclick="answerSwap(${w.id},false)">Từ chối</button></div></div>`).join('')}<button class="sec" style="width:100%" onclick="closeM()">Để sau</button></div></div>`;
+}
+async function answerSwap(id,ok){
+  const r=await rpc('swap_answer',{...auth(),p_id:id,p_accept:ok});
+  closeM();
+  if(!r.ok)toast(r.msg);else toast(ok?'Đã nhận ca, lịch đã đổi':'Đã từ chối');
+  S.phonesStale=1;load();
+}
+async function cancelSwap(id){
+  if(!confirm('Hủy yêu cầu hoặc lần đổi trực này (lịch trả về như cũ)?'))return;
+  const r=await rpc('swap_cancel',{...auth(),p_id:id});
+  if(!r.ok)return toast(r.msg);
+  toast('Đã hủy');S.phonesStale=1;load();
+}
 
-  S.swapRequests.push({
-    id: Date.now(),
-    day: S.data.day,
-    fromCode: S.data.code,
-    fromName: meObj.label,
-    toCode: targetCode,
-    toName: targetObj.label,
-    reason: reason,
-    status: 'waiting_b'
+async function viewMine(){
+  S.view='mine';
+  const r=await rpc('my_schedule',auth());
+  if(!r.ok){toast(r.msg);S.view='board';return}
+  S.mySched=r.days;
+  let h=renderHeader()+renderNav();
+  h+=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h2 style="margin:0">Ca trực sắp tới</h2><button class="sm pill" onclick="openSwap()">Đổi trực</button></div>`;
+  h+=r.days.length?r.days.map(x=>{
+    const pend=S.sw.mine.find(w=>w.status==='wait'&&w.from_code===S.data.code&&w.day_from===x.day);
+    return `<div class="item" style="margin-top:8px"><div class="mid"><b>${fmt(x.day)}</b><div class="meta"><span class="dt">${DUTY[x.duty]||x.duty}</span><span class="mut">Ca ${esc(x.team)}</span></div>${pend?`<div class="area">Đang chờ ${esc(pend.to_label)} trả lời</div>`:''}</div><button class="sm pill sec" onclick="openSwap('${x.day}')">Đổi</button></div>`}).join('')
+   :`<p class="mut">Bạn chưa có ca trực nào sắp tới trong lịch đã nhập.</p>`;
+  h+=`</div>`;
+  const rec=S.sw.mine.slice(0,8);
+  if(rec.length)h+=`<div class="card"><h2>Yêu cầu đổi trực của bạn</h2>${rec.map(w=>`<div style="padding:8px 0;border-top:1px solid var(--border);font-size:.82rem">${swText(w)} <span class="me">${SWST[w.status]}</span>${w.status==='wait'&&w.from_code===S.data.code?` <button class="sm pill sec" onclick="cancelSwap(${w.id})">Rút lại</button>`:''}</div>`).join('')}</div>`;
+  app.innerHTML=h;
+}
+
+async function openSwap(day){
+  const [a,b]=await Promise.all([rpc('my_schedule',auth()),rpc('swap_people',auth())]);
+  if(!a.ok||!b.ok)return toast((a.ok?b:a).msg);
+  if(!a.days.length)return toast('Bạn chưa có ca trực sắp tới để đổi');
+  S.mySched=a.days;S.people=b.people;
+  S.swf={day:day||a.days[0].day,kind:'HD',to:'',dayTo:'',reason:''};
+  renderSwap();
+}
+function swOpts(){
+  const f=S.swf,mine=new Set(S.mySched.map(x=>x.day));
+  return S.people.filter(p=>{
+    const has=p.days.find(x=>x.day===f.day);
+    if(f.kind==='DV')return has&&has.duty==='TC';
+    if(has)return false;
+    return f.kind==='NC'||p.days.some(x=>!mine.has(x.day));
   });
-
-  closeM();
-  toast('Đã gửi yêu cầu đổi trực cho đồng nghiệp xác nhận.');
-  checkPendingForMe();
 }
-
-function checkPendingForMe(){
-  const waitingForMe = S.swapRequests.find(s=>s.toCode===S.data.code && s.status==='waiting_b');
-  if(waitingForMe){
-    $('#modal').innerHTML=`<div class="ov"><div class="card">
-      <h2>Xác nhận đổi trực</h2>
-      <p>Đồng chí <b>${esc(waitingForMe.fromName)}</b> muốn đổi ca trực với bạn hôm nay.</p>
-      <p class="mut">Lý do: "${esc(waitingForMe.reason)}"</p>
-      <div class="act" style="margin-top:16px">
-        <button style="flex:1" onclick="confirmSwapByB(${waitingForMe.id}, true)">Đồng ý nhận ca</button>
-        <button class="sec" onclick="confirmSwapByB(${waitingForMe.id}, false)">Từ chối</button>
-      </div>
-    </div></div>`;
-  }
-}
-
-function confirmSwapByB(id, agree){
-  const req = S.swapRequests.find(s=>s.id===id);
-  if(!req) return;
-  if(!agree){
-    req.status = 'rejected';
-    closeM();
-    toast('Đã từ chối yêu cầu đổi trực.');
-    return;
-  }
-  req.status = 'pending';
-  closeM();
-  toast('Đã xác nhận! Thông tin đã chuyển đến Trực ban.');
-}
-
-function openSwapApprovals(){
-  const pending = S.swapRequests.filter(s=>s.status==='pending');
-  $('#modal').innerHTML=`<div class="ov"><div class="card" style="max-width:400px">
-    <h2>Thông tin đổi trực (Chờ Chỉ huy)</h2>
-    ${pending.length===0?'<p class="mut">Không có thông tin mới.</p>':''}
-    ${pending.map(p=>`
-      <div style="background:#F8FAFC;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border)">
-        <div><b>${esc(p.fromName)}</b> đổi với <b>${esc(p.toName)}</b></div>
-        <div class="mut" style="font-size:.78rem">Lý do: ${esc(p.reason)}</div>
-        <div class="mut" style="font-size:.72rem;color:var(--primary-blue);margin-top:4px">Đã xác nhận đồng ý · Chờ Chỉ huy quyết định</div>
-      </div>
-    `).join('')}
-    <button class="sec" style="width:100%;margin-top:10px" onclick="closeM()">Đóng</button>
+function renderSwap(){
+  const f=S.swf,my=S.mySched.find(x=>x.day===f.day),canDV=my&&my.duty==='TB';
+  if(f.kind==='DV'&&!canDV)f.kind='HD';
+  const L=swOpts(),p=L.find(x=>x.code===f.to);
+  if(!p){f.to='';f.dayTo=''}
+  const days=p&&f.kind==='HD'?p.days.filter(x=>!S.mySched.some(m=>m.day===x.day)):[];
+  if(f.kind==='HD'&&p&&!days.some(x=>x.day===f.dayTo))f.dayTo=days[0]?days[0].day:'';
+  $('#modal').innerHTML=`<div class="ov"><div class="card" style="max-height:90vh;overflow:auto">
+    <h2>Đổi trực</h2>
+    <label class="mut">Ca của bạn</label>
+    <select onchange="S.swf.day=this.value;renderSwap()">${S.mySched.map(x=>`<option value="${x.day}" ${x.day===f.day?'selected':''}>${fmt(x.day)} · ${DUTY[x.duty]||x.duty}</option>`).join('')}</select>
+    <label class="mut" style="margin-top:10px;display:block">Kiểu đổi</label>
+    <select onchange="S.swf.kind=this.value;renderSwap()">
+      <option value="HD" ${f.kind==='HD'?'selected':''}>Hoán đổi: hai người đổi ca cho nhau</option>
+      <option value="NC" ${f.kind==='NC'?'selected':''}>Nhượng ca: người kia nhận ca của bạn</option>
+      ${canDV?`<option value="DV" ${f.kind==='DV'?'selected':''}>Đổi vai với trực chiến cùng ca</option>`:''}
+    </select>
+    <label class="mut" style="margin-top:10px;display:block">Người nhận</label>
+    <select onchange="S.swf.to=this.value;renderSwap()"><option value="">(Chọn người)</option>${L.map(x=>`<option value="${esc(x.code)}" ${x.code===f.to?'selected':''}>${esc(x.label)} (${esc(x.code)})</option>`).join('')}</select>
+    ${f.kind==='HD'&&p?`<label class="mut" style="margin-top:10px;display:block">Ca của ${esc(p.label)}</label><select onchange="S.swf.dayTo=this.value">${days.map(x=>`<option value="${x.day}" ${x.day===f.dayTo?'selected':''}>${fmt(x.day)} · ${DUTY[x.duty]||x.duty}</option>`).join('')}</select>`:''}
+    ${f.kind==='DV'?'':`<label class="mut" style="margin-top:10px;display:block">Lý do</label><input maxlength="120" value="${esc(f.reason)}" oninput="S.swf.reason=this.value" placeholder="Ví dụ: việc gia đình">`}
+    <p class="err" id="swe"></p>
+    <div class="act"><button style="flex:1" onclick="submitSwap()">${f.kind==='DV'?'Đổi vai ngay':'Gửi yêu cầu'}</button><button class="sec" onclick="closeM()">Hủy</button></div>
   </div></div>`;
+}
+async function submitSwap(){
+  const f=S.swf;
+  if(!f.to)return $('#swe').textContent='Hãy chọn người nhận';
+  if(f.kind==='HD'&&!f.dayTo)return $('#swe').textContent='Hãy chọn ca của người nhận';
+  const r=await rpc('swap_create',{...auth(),p_kind:f.kind,p_day:f.day,p_to:f.to,p_day_to:f.kind==='HD'?f.dayTo:null,p_reason:f.reason.trim()});
+  if(!r.ok)return $('#swe').textContent=r.msg;
+  const p=S.people.find(x=>x.code===f.to),me=S.data.label;
+  S.lastMsg=f.kind==='DV'?`[Đổi vai ${fmt(f.day)}] ${me} chuyển sang trực chiến, ${p.label} sang trực ban.`
+    :f.kind==='NC'?`[Đổi trực] ${me} đề nghị ${p.label} nhận ca trực ${fmt(f.day)}. Vui lòng mở Bảng điều phối để trả lời.`
+    :`[Đổi trực] ${me} đề nghị đổi ca ${fmt(f.day)} lấy ca ${fmt(f.dayTo)} của ${p.label}. Vui lòng mở Bảng điều phối để trả lời.`;
+  S.phonesStale=1;
+  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${f.kind==='DV'?'Đã đổi vai':'Đã gửi yêu cầu'}</h2><p class="mut">${f.kind==='DV'?'Thay đổi có hiệu lực ngay.':'Người nhận sẽ thấy thông báo khi mở ứng dụng.'} Nên nhắn thêm qua Zalo cho chắc.</p><div class="act"><button style="flex:1" onclick="shareText(S.lastMsg)">Báo qua Zalo</button><button class="sec" onclick="closeM()">Đóng</button></div></div></div>`;
+  load();
+}
+
+function viewStats(){
+  S.view='stats';
+  const iso=x=>new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,10),t=new Date();
+  if(!S.stf)S.stf={from:iso(new Date(t.getFullYear(),t.getMonth(),1)),to:iso(t)};
+  app.innerHTML=renderHeader()+renderNav()+`<div class="card"><h2>Thống kê</h2><p class="mut">Tải bảng từng ca trực: giờ khai báo đầu tiên, giờ cập nhật cuối, số lần đổi trạng thái. Giờ chỉ có từ ngày chạy SQL ghi nhận; các ngày trước đó để trống.</p>
+    <label class="mut">Từ ngày</label><input type="date" value="${S.stf.from}" onchange="S.stf.from=this.value">
+    <label class="mut" style="margin-top:8px;display:block">Đến ngày</label><input type="date" value="${S.stf.to}" onchange="S.stf.to=this.value">
+    <p class="err" id="sfe"></p><button style="width:100%" onclick="exportStats()">Tải bảng CSV</button></div>`;
+}
+async function exportStats(){
+  const r=await rpc('stats_range',{...auth(),p_from:S.stf.from,p_to:S.stf.to});
+  if(!r.ok)return $('#sfe').textContent=r.msg;
+  if(!r.rows.length)return $('#sfe').textContent='Không có ca trực nào trong khoảng này';
+  const tm=a=>a?new Date(a).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const L=[['Ngày','Mã','Họ tên','Nhiệm vụ','Trạng thái cuối','Địa bàn','Khai báo đầu tiên','Người khai đầu','Cập nhật cuối','Số lần đổi','Người sửa cuối']]
+    .concat(r.rows.map(x=>[fmt(x.day),x.code,x.label,DUTY[x.duty]||x.duty,x.st||NU,x.area,tm(x.first_at),x.first_by,tm(x.last_at),x.n,x.last_by]));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+L.map(l=>l.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='thong-ke-'+S.stf.from+'-'+S.stf.to+'.csv';document.body.appendChild(a);a.click();a.remove();
 }
 
 function edit(code){
@@ -790,10 +849,13 @@ async function sendZalo(){
 }
 
 async function nudge(){
-  const d=S.data,n=d.rows.filter(r=>r.st===NU).map(r=>r.label+' ('+r.code+')').join(', ');
-  const msg=`[Nhắc trực ${fmt(d.day)}] Các đồng chí chưa cập nhật trạng thái: ${n}. Vui lòng cập nhật.`;
+  const d=S.data,rows=d.rows,nu=rows.filter(r=>r.st===NU),cnt={};
+  rows.forEach(r=>{if(r.st!==NU)cnt[r.st]=(cnt[r.st]||0)+1});
+  const sum=Object.keys(cnt).map(k=>k+' '+cnt[k]).join(', ')||'chưa có ai khai báo';
+  let msg=`[Quân số trực ${fmt(d.day)}] Ca trực ${rows.length} người, đã khai báo ${rows.length-nu.length}/${rows.length}.\nTình hình: ${sum}.`;
+  if(nu.length)msg+=`\nChưa khai báo (${nu.length}): ${nu.map(r=>r.label+' ('+r.code+')').join(', ')}.\nĐề nghị các đồng chí cập nhật trạng thái trên Bảng điều phối.`;
   if(navigator.share){try{await navigator.share({text:msg});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(msg);toast('Đã chép lời nhắc, dán vào nhóm Zalo')}catch(e){toast('Hãy chép lời nhắc vào nhóm')}
+  try{await navigator.clipboard.writeText(msg);toast('Đã chép tin nhắc, dán vào nhóm Zalo')}catch(e){toast('Hãy chép tin nhắc vào nhóm')}
 }
 
 async function viewOverview(day){
@@ -838,6 +900,7 @@ async function viewAdmin(){
   if(!r.ok){toast(r.msg);S.view='board';return}
   const ar=await rpc('get_areas',auth());if(ar.ok){S.areas=ar.areas;S.areasOk=true}
   S.locked=r.officers.filter(o=>o.locked);
+  const ph=await rpc('get_phones',auth());S.phones=(ph.ok&&ph.phones)?ph.phones:{};
   
   let h = renderHeader() + renderNav();
   h += `
@@ -847,7 +910,7 @@ async function viewAdmin(){
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
           <div>
             <b>${esc(o.code)} - ${esc(o.label)}</b>
-            <div class="mut" style="font-size:.75rem">${KIND[o.kind]||o.kind}${o.active?'':' · Ngừng'}${o.locked?' · KHÓA':''}</div>
+            <div class="mut" style="font-size:.75rem">${KIND[o.kind]||o.kind}${o.active?'':' · Ngừng'}${o.locked?' · KHÓA':''}${S.phones[o.code]?' · '+esc(S.phones[o.code]):' · chưa có SĐT'}</div>
           </div>
           <div class="act">
             <button class="sec sm" onclick='editOfficerModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Sửa</button>
@@ -877,6 +940,14 @@ async function viewAdmin(){
       <h2>Quản lý danh sách địa bàn</h2>
       <textarea id="ar" rows="5">${esc(S.areas.join('\n'))}</textarea>
       <button style="width:100%;margin-top:12px" onclick="saveAreas()">Lưu địa bàn</button>
+    </div>
+
+    <div class="card">
+      <h2>Số điện thoại cán bộ</h2>
+      <p class="mut">Mỗi dòng một người: <code>MÃ,SỐ</code> (ví dụ: CB07,0912345678). Để trống số để xóa. Chỉ nhập số điện thoại công vụ.</p>
+      <textarea id="phn" rows="5"></textarea>
+      <p class="err" id="phe"></p>
+      <button style="width:100%;margin-top:10px" onclick="savePhones()">Lưu số điện thoại</button>
     </div>
 
     <div class="card">
@@ -960,6 +1031,22 @@ async function saveAreas(){
   const r=await rpc('admin_save_areas',{...auth(),p_names:names});
   if(!r.ok)return toast(r.msg);
   S.areas=names;toast('Đã lưu danh sách địa bàn');
+}
+
+async function savePhones(){
+  const rows=[];let bad='';
+  $('#phn').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    const p=l.split(/[,;\t]/).map(x=>x.trim());
+    const code=(p[0]||'').toUpperCase(),phone=(p[1]||'').replace(/[\s.\-]/g,'');
+    if(!code||(phone&&!/^0\d{9,10}$/.test(phone)))bad=bad||'Dòng sai: '+l;
+    else rows.push({code,phone});
+  });
+  if(bad)return $('#phe').textContent=bad;
+  if(!rows.length)return $('#phe').textContent='Chưa có dòng hợp lệ';
+  const r=await rpc('admin_set_phones',{...auth(),p_rows:rows});
+  if(!r.ok)return $('#phe').textContent=r.msg;
+  $('#phe').textContent=r.miss&&r.miss.length?'Không có mã: '+r.miss.join(', '):'';
+  toast('Đã lưu '+r.n+' số điện thoại');$('#phn').value='';viewAdmin();
 }
 
 async function doImport(){

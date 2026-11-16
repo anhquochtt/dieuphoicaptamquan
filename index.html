@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0d0d0f">
+<meta name="theme-color" content="#050C18">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,67 +10,106 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Bảng điều phối quân số</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Chakra+Petch:wght@500;600;700&display=swap">
 <style>
-:root{--bg:#f5f2ef;--fg:#101012;--mut:#6b6f76;--card:#fff;--bd:#e8e4e0;--or:#ff7a1a;--ink:#0d0d0f;--grb:#efecea;--sunb:#ffe3c2;--sun:#8a4300;--tbb:#e1e8ff;--tb:#2f46b5;--sh:0 2px 10px rgba(0,0,0,.06)}
-@media(prefers-color-scheme:dark){:root{--bg:#18181b;--fg:#f1f1f3;--mut:#a3a7af;--card:#242428;--bd:#34343a;--grb:#2e2e33;--sunb:#4a3010;--sun:#ffc27a;--tbb:#26325e;--tb:#a9bbff;--sh:0 2px 10px rgba(0,0,0,.4)}}
+:root{color-scheme:light dark;
+--disp:"Chakra Petch","Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif;
+--bg:#EAF0F8;--bg2:#F4F8FD;--panel:#FFFFFF;--line:#CCD9EA;--line2:#B0C2DB;
+--fg:#0B1B33;--mut:#4F6385;--cy:#0B6FB8;--cyg:rgba(11,111,184,.2);
+--btn:#0B6FB8;--btnfg:#FFFFFF;--am:#B45F00;--err:#C62835;--hd:#071426;
+--sh:0 1px 0 rgba(11,27,51,.04),0 8px 22px rgba(11,27,51,.08);--grid:rgba(11,111,184,.07)}
+@media(prefers-color-scheme:dark){:root{
+--bg:#060E1B;--bg2:#0A1626;--panel:#0D1A2E;--line:#1B2E4A;--line2:#2A4468;
+--fg:#E4EDFB;--mut:#8DA3C4;--cy:#3ED8FF;--cyg:rgba(62,216,255,.22);
+--btn:#3ED8FF;--btnfg:#03121D;--am:#FFB347;--err:#FF7A82;--hd:#050C18;
+--sh:0 8px 28px rgba(0,0,0,.45);--grid:rgba(62,216,255,.05)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 "Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif}
+body{margin:0;color:var(--fg);font:16px/1.5 "Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif;background-color:var(--bg);
+background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-attachment:fixed}
 main{max-width:760px;margin:0 auto;padding:12px}
-h1{font-size:1.45rem;margin:0 0 4px;font-weight:800}h2{font-size:1.05rem;margin:0 0 10px;font-weight:700}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+h1{font:600 1.5rem/1.2 var(--disp);margin:0 0 6px}h2{font:600 1.05rem/1.3 var(--disp);margin:0 0 10px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.card::before,.card::after{content:"";position:absolute;width:12px;height:12px;pointer-events:none;border:0 solid var(--cy)}
+.card::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-top-left-radius:6px}
+.card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-bottom-right-radius:6px}
 .narrow{max-width:400px;margin:5vh auto 0}
-.mut{color:var(--mut);font-size:.85rem}.err{color:#e5484d;min-height:1.2em;margin:6px 0;font-weight:600}
-a{color:var(--or);font-weight:600}
-label{display:block;margin:10px 0;font-size:.92rem;font-weight:600}
-input,select,textarea{display:block;width:100%;margin-top:4px;padding:12px;font:inherit;font-weight:400;color:var(--fg);background:var(--bg);border:2px solid var(--bd);border-radius:14px}
+.mut{color:var(--mut);font-size:.85rem}.err{color:var(--err);min-height:1.2em;margin:6px 0;font-weight:600}
+a{color:var(--cy);font-weight:600}
+label{display:block;margin:10px 0;font-size:.9rem;font-weight:600}
+input,select,textarea{display:block;width:100%;margin-top:4px;padding:11px 12px;font:inherit;font-weight:400;color:var(--fg);background:var(--bg2);border:1px solid var(--line2);border-radius:4px}
 input[type=checkbox]{display:inline-block;width:auto;margin-right:6px}
-button{font:inherit;font-weight:700;padding:10px 18px;border:0;border-radius:999px;background:var(--or);color:#fff;cursor:pointer}
-button:active{transform:scale(.97)}
-button.sec{background:var(--card);color:var(--fg);border:2px solid var(--bd)}
-button.sm{padding:6px 14px;font-size:.82rem}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+button{font:600 .95rem var(--disp);padding:10px 18px;border:0;border-radius:4px;background:var(--btn);color:var(--btnfg);cursor:pointer;letter-spacing:.01em}
+button:active{transform:translateY(1px)}
+button.sec{background:transparent;color:var(--fg);border:1px solid var(--line2)}
+button.sm{padding:6px 13px;font-size:.82rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+input:focus,select:focus,textarea:focus{border-color:var(--cy);box-shadow:0 0 0 3px var(--cyg)}
 .act{display:flex;gap:6px;flex-wrap:wrap}
-.lg{max-width:420px;margin:0 auto}.brand{text-align:center;font-weight:800;font-size:1.15rem;padding:10px 0}
-.art{height:210px;position:relative;display:flex;align-items:center;justify-content:center}
-.big{font-size:6.5rem;line-height:1}
-.art span:not(.big){position:absolute;width:58px;height:58px;border-radius:50%;background:var(--card);box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;font-size:1.8rem}
-.b1{left:12%;top:18%;background:#ffd9e6!important}.b2{right:12%;top:30%;background:#dbe3ff!important}.b3{left:24%;bottom:6%;background:#ffe9b8!important}
-.dk{background:var(--ink);color:#fff;border-radius:28px;padding:20px 18px 22px;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px}
-.dk p{margin:0 0 6px;color:#b9b9c0;font-size:.9rem}.dk input{background:#1d1d21;border-color:#303036;color:#fff;margin-bottom:10px}.dk .cta{width:100%;padding:14px}
-.hd{background:var(--ink);color:#fff;border-radius:0 0 28px 28px;padding:16px;margin:-12px -12px 14px;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px}
-.hr{display:flex;justify-content:space-between;gap:10px;align-items:center}.hr .g{display:block;font-size:.85rem;color:#c3c3ca}.nm{font-size:1.25rem}
-.ib{width:42px;height:42px;padding:0;border-radius:50%;background:#2c2c31;font-size:1.05rem}
-nav{display:flex;gap:8px;margin-bottom:12px}nav button{flex:1}
-.sc{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:4px}
-.tl{flex:0 0 128px;text-align:left;border-radius:22px;padding:12px;color:#14131a;background:color-mix(in srgb,var(--c) 45%,#fff);display:flex;flex-direction:column;gap:2px;font-size:.88rem;border:3px solid transparent}
-.tl.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--or)}.tl .ti{font-size:1.6rem}.tl .n{font-weight:500;opacity:.8;font-size:.8rem}
-.pg{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.ring{--p:0;width:58px;height:58px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--or) calc(var(--p)*1%),var(--grb) 0);display:flex;align-items:center;justify-content:center}
-.ring i{width:44px;height:44px;border-radius:50%;background:var(--card);font-style:normal;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center}
-.alert{background:color-mix(in srgb,var(--or) 14%,var(--card));border:1px solid color-mix(in srgb,var(--or) 45%,transparent);border-radius:18px;padding:10px 12px;margin-bottom:10px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:.9rem;font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c,var(--mut));flex-shrink:0}
+/* đăng nhập */
+.lg{max-width:420px;margin:0 auto;padding-top:5vh}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.brand .logo{width:52px;height:52px;display:flex;align-items:center;justify-content:center;color:var(--cy);background:var(--panel);border:1px solid var(--cy);border-radius:6px;box-shadow:0 0 18px var(--cyg)}
+.brand b{display:block;font:600 1.3rem/1.2 var(--disp)}.brand span.s{color:var(--mut);font-size:.85rem}
+.dk p{margin:0 0 10px;color:var(--mut);font-size:.9rem}.dk input{margin-bottom:10px}.dk .cta{width:100%;padding:13px}
+/* thanh đầu trang */
+.hd{position:relative;background-color:var(--hd);color:#E4EDFB;padding:16px 16px 14px;margin:-12px -12px 12px;border-bottom:1px solid #17365A;
+background-image:linear-gradient(rgba(62,216,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(62,216,255,.06) 1px,transparent 1px);background-size:22px 22px}
+.hd::after{content:"";position:absolute;left:0;bottom:-1px;width:60%;height:2px;background:linear-gradient(90deg,#3ED8FF,transparent)}
+.hr{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.hr>div:first-child{min-width:0}.hr .act{flex-wrap:nowrap;flex-shrink:0}
+.hr .g{display:block;font-size:.84rem;color:#9FB6D8}.nm{display:block;font:600 1.35rem/1.25 var(--disp)}
+#clk{font-family:var(--disp);font-variant-numeric:tabular-nums;color:#3ED8FF}
+.ib{width:40px;height:40px;padding:0;border-radius:4px;background:rgba(255,255,255,.05);border:1px solid #274669;color:#BCD3F2;display:flex;align-items:center;justify-content:center}
+.ib:hover{border-color:#3ED8FF;color:#3ED8FF}
+nav{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--line)}
+nav button{flex:1;background:transparent;color:var(--fg);border-radius:0;border:0;border-bottom:3px solid var(--cy);padding:10px 8px;margin-bottom:-1px}
+nav button.sec{color:var(--mut);border:0;border-bottom:3px solid transparent}
+/* dải thống kê trạng thái */
+.sc{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:2px}
+.tl{flex:0 0 112px;text-align:left;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:4px;padding:8px 10px;display:flex;flex-direction:column}
+.tl .cn{font:600 1.9rem/1.1 var(--disp);color:color-mix(in srgb,var(--c) 70%,var(--fg))}
+.tl .n{font:600 .76rem/1.25 "Be Vietnam Pro",sans-serif;color:var(--mut);margin-top:2px}
+.tl.on{box-shadow:0 0 0 1px var(--c),0 0 16px color-mix(in srgb,var(--c) 35%,transparent);background:color-mix(in srgb,var(--c) 10%,var(--panel))}
+/* quân số: vòng chia đoạn, mỗi đoạn một người */
+.pg{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pg b{font:600 1.05rem var(--disp)}
+.gauge{width:96px;height:96px;flex-shrink:0}.gauge text{font:600 17px var(--disp);fill:var(--fg)}
+.alert{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;font-size:.9rem;font-weight:600;
+border:1px solid color-mix(in srgb,var(--am) 55%,transparent);border-left:4px solid var(--am);border-radius:4px;background:color-mix(in srgb,var(--am) 12%,var(--panel))}
 .qg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.q{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;border-radius:16px;font-size:.78rem;font-weight:600;color:var(--fg);background:color-mix(in srgb,var(--c) 16%,var(--card));border:2px solid transparent;text-align:center}
-.q span{font-size:1.4rem}.q.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 30%,var(--card))}
+.q{display:flex;align-items:center;gap:8px;padding:10px;border-radius:4px;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font:600 .8rem/1.25 "Be Vietnam Pro",sans-serif;text-align:left}
+.q.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,var(--panel));box-shadow:0 0 0 1px var(--c),0 0 14px color-mix(in srgb,var(--c) 30%,transparent)}
 .seg{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0}
-.seg button{background:var(--card);color:var(--fg);padding:7px 14px;font-size:.84rem;border:2px solid var(--bd)}.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.gh{display:flex;justify-content:space-between;font-weight:800;margin:14px 2px 8px}.gh span{font-weight:600;color:var(--mut);font-size:.85rem}
-.item{display:flex;gap:12px;align-items:center;background:var(--card);border:2px solid transparent;border-radius:22px;padding:12px;margin-bottom:10px;box-shadow:var(--sh)}
-.item.nu{border:2px dashed var(--or);background:color-mix(in srgb,var(--or) 9%,var(--card))}
-.ic{width:48px;height:48px;border-radius:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:color-mix(in srgb,var(--c) 24%,var(--card))}
+.seg button{background:var(--panel);color:var(--fg);padding:6px 13px;font-size:.84rem;border:1px solid var(--line2)}
+.seg button.on{background:color-mix(in srgb,var(--cy) 18%,var(--panel));border-color:var(--cy);color:var(--cy)}
+.gh{display:flex;align-items:center;gap:10px;font:600 .98rem var(--disp);margin:16px 2px 8px}
+.gh::after{content:"";flex:1;height:1px;background:var(--line);order:1}
+.gh span{order:2;font:600 .8rem "Be Vietnam Pro",sans-serif;color:var(--mut)}
+/* mỗi người một hàng, thanh bên trái đổi màu theo trạng thái */
+.item{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:4px;padding:10px 12px;margin-bottom:8px}
+.item.nu{background:color-mix(in srgb,var(--c) 8%,var(--panel))}
+.av{width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font:600 1.1rem var(--disp);color:color-mix(in srgb,var(--c) 70%,var(--fg));
+background:color-mix(in srgb,var(--c) 22%,var(--panel));clip-path:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%)}
 .mid{flex:1;min-width:0}.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}
-.area{margin-top:4px;font-size:.88rem;font-weight:600;color:var(--or)}
-.me{font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--sunb);color:var(--sun)}
-.dt{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--grb);color:var(--mut)}
-.dCH{background:var(--sunb);color:var(--sun)}.dTB{background:var(--tbb);color:var(--tb)}
+.area{margin-top:4px;font-size:.88rem;font-weight:600;color:var(--cy)}
+.area::before{content:"";display:inline-block;width:6px;height:6px;border:1.5px solid currentColor;transform:rotate(45deg);margin-right:8px;position:relative;top:-1px}
+.me{font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:3px;background:var(--cyg);color:var(--cy);border:1px solid var(--cy)}
+.dt{font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg2);color:var(--mut);border:1px solid var(--line)}
+.dCH{background:color-mix(in srgb,var(--am) 16%,var(--panel));color:var(--am);border-color:color-mix(in srgb,var(--am) 40%,transparent)}
+.dTB{background:color-mix(in srgb,var(--cy) 14%,var(--panel));color:var(--cy);border-color:color-mix(in srgb,var(--cy) 40%,transparent)}
 .r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.st{font-size:.82rem;font-weight:700;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--c,#888) 16%,var(--card));color:color-mix(in srgb,var(--c,#888) 70%,var(--fg))}
-.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}.row:first-of-type{border-top:0}
-.ov{position:fixed;inset:0;background:rgba(10,10,14,.62);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;z-index:5}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:3px 9px;border-radius:4px;border:1px solid color-mix(in srgb,var(--c,#888) 45%,transparent);
+background:color-mix(in srgb,var(--c,#888) 14%,var(--panel));color:color-mix(in srgb,var(--c,#888) 65%,var(--fg))}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.row:first-of-type{border-top:0}
+.ov{position:fixed;inset:0;background:rgba(3,8,16,.74);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;z-index:5}
 .ov .card{width:100%;max-width:420px;margin-top:8vh}
-.pin{font-size:2.4rem;letter-spacing:.3em;text-align:center;font-weight:800;margin:10px 0;color:var(--or)}
-#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:9;max-width:90%;font-weight:600}
-code{background:var(--grb);padding:1px 6px;border-radius:6px}
+.pin{font:700 2.6rem var(--disp);letter-spacing:.3em;text-align:center;margin:10px 0;color:var(--cy);text-shadow:0 0 18px var(--cyg)}
+#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--hd);color:#E4EDFB;border:1px solid #3ED8FF;padding:10px 16px;border-radius:4px;display:none;z-index:9;max-width:90%;font-weight:600}
+code{background:var(--bg2);border:1px solid var(--line);padding:1px 6px;border-radius:3px;font-size:.85em}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 60%,transparent)}50%{box-shadow:0 0 0 5px transparent}}
+.item.nu .st .dot{animation:pl 2.2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.item.nu .st .dot{animation:none}button:active{transform:none}}
 </style></head><body>
 <main id="app"></main><div id="modal"></div><div id="toast"></div>
 <script>
@@ -78,17 +117,27 @@ const API='https://ihrihhpovslcywzjtjtx.supabase.co/rest/v1/rpc/';
 const KEY='sb_publishable_a_pTZDIgAbLO4F2_usPJUw_d0dEgNSn';
 const ST=['Sẵn sàng','Trực ban','Tuần tra','Tiếp công dân','Giải quyết vụ việc','Công tác khác','Nghỉ phép/bù','Ốm','Học tập/công tác'];
 const DUTY={CH:'Chỉ huy',TB:'Trực ban',TC:'Trực chiến'};
+const KIND={CB:'Cán bộ',CH:'Chỉ huy',TR:'Trưởng CA',QT:'Quản trị'};
+const TEAM0='A'; // cột "ca" trong lịch không còn dùng: ghi cố định cho tương thích, lịch theo từng ngày
 const ROLE={ad:'Quản trị',ch:'Chỉ huy',tb:'Trực ban',tc:'Trực chiến',off:'Không có ca trực hôm nay'};
-let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[]};
+let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:''};
 const $=s=>document.querySelector(s), app=$('#app');
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=d=>d?d.split('-').reverse().join('/'):'';
 const when=a=>a?new Date(a).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}):'';
 const cls=s=>['Sẵn sàng','Trực ban'].includes(s)?'ok':['Tuần tra','Tiếp công dân','Giải quyết vụ việc','Công tác khác'].includes(s)?'wa':['Nghỉ phép/bù','Ốm','Học tập/công tác'].includes(s)?'bad':'';
-const IC={'Sẵn sàng':'✅','Trực ban':'🛡️','Tuần tra':'🚓','Tiếp công dân':'🤝','Giải quyết vụ việc':'📋','Công tác khác':'💼','Nghỉ phép/bù':'🌴','Ốm':'🤒','Học tập/công tác':'🎓','Chưa cập nhật':'⏳'};
 const SCOL={'Sẵn sàng':'#16a34a','Trực ban':'#0d9488','Tuần tra':'#2563eb','Tiếp công dân':'#7c3aed','Giải quyết vụ việc':'#ea580c','Công tác khác':'#db2777','Nghỉ phép/bù':'#ca8a04','Ốm':'#dc2626','Học tập/công tác':'#4f46e5','Chưa cập nhật':'#ff7a1a'};
-const DI={CH:'⭐',TB:'🛡️',TC:'⚡'},NU='Chưa cập nhật',PROOF=['Công tác khác','Học tập/công tác'];
+const NU='Chưa cập nhật',PROOF=['Công tác khác','Học tập/công tác'];
 const col=s=>SCOL[s]||'#6b7280';
+const svg=(p,w)=>`<svg viewBox="0 0 24 24" width="${w||18}" height="${w||18}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const nowT=()=>new Date().toLocaleTimeString('vi-VN',{hour12:false});
+setInterval(()=>{const e=$('#clk');if(e)e.textContent=nowT()},1000);
+function gauge(rows,done){
+  if(!rows.length)return '';
+  const n=rows.length,R=34,C=2*Math.PI*R,len=Math.max(C/n-(n>1?3:0),1);
+  const seg=rows.map((r,i)=>`<circle cx="45" cy="45" r="${R}" fill="none" stroke="${r.st===NU?'var(--line2)':col(r.st)}" stroke-width="8" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-i*C/n).toFixed(2)}"/>`).join('');
+  return `<svg class="gauge" viewBox="0 0 90 90" role="img" aria-label="${done} trên ${n} người đã cập nhật"><g transform="rotate(-90 45 45)">${seg}</g><text x="45" y="50" text-anchor="middle">${done}/${n}</text></svg>`;
+}
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500)}
 function closeM(){$('#modal').innerHTML=''}
 async function rpc(fn,a){
@@ -100,9 +149,8 @@ const auth=()=>({p_code:S.code,p_pin:S.pin});
 
 /* ---- Đăng nhập ---- */
 function viewLogin(msg){
-  app.innerHTML=`<div class="lg"><div class="brand">🛡️ Điều phối quân số</div>
-  <div class="art"><span class="b1">✅</span><span class="b2">📋</span><span class="b3">🚓</span><div class="big">🛡️</div></div>
-  <div class="dk"><h1>Chào mừng trở lại</h1><p>Cập nhật trạng thái trực nhanh hơn, dễ hơn.</p>
+  app.innerHTML=`<div class="lg"><div class="brand"><span class="logo">${svg('<path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>',30)}</span><div><b>Điều phối quân số</b><span class="s">Công an phường Tam Quan</span></div></div>
+  <div class="card dk"><h1>Đăng nhập</h1><p>Nhập mã cán bộ và PIN 4 số.</p>
   <input id="c" autocapitalize="characters" autocomplete="username" placeholder="Mã cán bộ, ví dụ CB07" onkeydown="if(event.key==='Enter')$('#p').focus()">
   <input id="p" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="PIN 4 số" onkeydown="if(event.key==='Enter')doLogin()">
   <p class="err">${esc(msg||'')}</p><button class="cta" onclick="doLogin()">Đăng nhập</button></div></div>`;
@@ -113,7 +161,7 @@ async function doLogin(){
   if(!r.ok)return viewLogin(r.msg);
   S.code=c;S.pin=p;S.me=r;r.must_change?viewChange():load();
 }
-function logout(){clearInterval(S.timer);S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[]};closeM();viewLogin()}
+function logout(){clearInterval(S.timer);S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:''};closeM();viewLogin()}
 
 /* ---- Đổi PIN ---- */
 function viewChange(msg){
@@ -136,28 +184,30 @@ async function load(){
   const r=await rpc('board',auth());
   if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
   if(!S.areasOk){const a=await rpc('get_areas',auth());if(a.ok){S.areas=a.areas;S.areasOk=true}}
+  if(r.kind==='TR'){const o=await rpc('tr_overview',{...auth(),p_day:null});if(o.ok)r.log=o.log.slice(0,12)}
   S.data=r;if(r.role==='ad'){const a=await rpc('admin_list',auth());if(a.ok)S.locked=a.officers.filter(o=>o.locked)}
-  if(S.view==='board')viewBoard();
+  if(S.view==='board')viewBoard();else if(S.view==='ov')viewOverview(S.ovDay);
   clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML)load()},30000);
 }
 const ini=l=>((String(l||'?').trim().split(/\s+/).pop())||'?').charAt(0).toUpperCase();
 function head(){
   const d=S.data,hr=new Date().getHours(),g=hr<11?'Chào buổi sáng':hr<14?'Chào buổi trưa':hr<18?'Chào buổi chiều':'Chào buổi tối';
   const me=d.rows.find(r=>r.code===d.code);
-  const sub=me?`Hôm nay bạn trực: ${DI[me.duty]} ${DUTY[me.duty]}`:d.role==='ad'?'Chế độ quản trị':'Hôm nay bạn không có ca trực';
-  return `<header class="hd"><div class="hr"><div><span class="g">${g} 👋</span><b class="nm">${esc(d.label)}</b><span class="g">${sub}</span></div>
-  <div class="act"><button class="ib" title="Làm mới" onclick="load()">🔄</button><button class="ib" title="Đổi PIN" onclick="viewChange()">🔑</button><button class="ib" title="Thoát" onclick="logout()">🚪</button></div></div></header>`+
-  (d.role==='ad'?`<nav><button class="${S.view==='board'?'':'sec'}" onclick="S.view='board';viewBoard()">📊 Bảng quân số</button><button class="${S.view==='admin'?'':'sec'}" onclick="viewAdmin()">⚙️ Quản trị</button></nav>`:'');
+  const sub=d.kind==='TR'?'Trưởng Công an phường · '+(me?`Hôm nay trực: ${DUTY[me.duty]}`:'xem toàn bộ')
+    :me?`Hôm nay bạn trực: ${DUTY[me.duty]}`:d.role==='ad'?'Chế độ quản trị':'Hôm nay bạn không có ca trực';
+  return `<header class="hd"><div class="hr"><div><span class="g">${g} · <span id="clk">${nowT()}</span></span><b class="nm">${esc(d.label)}</b><span class="g">${sub}</span></div>
+  <div class="act"><button class="ib" title="Làm mới" aria-label="Làm mới" onclick="load()">${svg('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>')}</button><button class="ib" title="Đổi PIN" aria-label="Đổi PIN" onclick="viewChange()">${svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>')}</button><button class="ib" title="Thoát" aria-label="Thoát" onclick="logout()">${svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>')}</button></div></div></header>`+
+  (d.role==='ad'?`<nav><button class="${S.view==='board'?'':'sec'}" onclick="S.view='board';viewBoard()">Bảng quân số</button><button class="${S.view==='admin'?'':'sec'}" onclick="viewAdmin()">Quản trị</button></nav>`:d.kind==='TR'?`<nav><button class="${S.view==='board'?'':'sec'}" onclick="S.view='board';viewBoard()">Hôm nay</button><button class="${S.view==='ov'?'':'sec'}" onclick="viewOverview()">Các ngày</button></nav>`:'');
 }
 function setF(k){S.filter=S.filter===k?'':k;viewBoard()}
 function setG(k){S.group=k;viewBoard()}
 function item(r){
   const d=S.data,can=r.code===d.code||d.role==='tb',nu=r.st===NU;
-  return `<div class="item ${nu?'nu':''}" style="--c:${col(r.st)}"><div class="ic">${IC[r.st]||'❔'}</div>
+  return `<div class="item ${nu?'nu':''}" style="--c:${col(r.st)}"><div class="av">${esc(ini(r.label))}</div>
   <div class="mid"><b>${esc(r.label)}</b>${r.code===d.code?' <span class="me">Bạn</span>':''}
-  <div class="meta"><span class="dt d${esc(r.duty)}">${DI[r.duty]||''} ${DUTY[r.duty]||''}</span><span class="mut">${esc(r.code)} · Ca ${esc(r.team)}</span></div>
-  ${r.area?`<div class="area">📍 ${esc(r.area)}</div>`:''}</div>
-  <div class="r"><span class="st">${IC[r.st]||''} ${esc(r.st)}</span><span class="mut">${when(r.at)}</span>${can?`<button class="sm" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}</div></div>`;
+  <div class="meta"><span class="dt d${esc(r.duty)}">${DUTY[r.duty]||''}</span><span class="mut">${esc(r.code)}</span></div>
+  ${r.area?`<div class="area">${esc(r.area)}</div>`:''}</div>
+  <div class="r"><span class="st"><i class="dot"></i>${esc(r.st)}</span><span class="mut">${when(r.at)}</span>${can?`<button class="sm" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}</div></div>`;
 }
 function viewBoard(){
   S.view='board';const d=S.data,rows=d.rows,cnt={},f=S.filter;
@@ -165,19 +215,19 @@ function viewBoard(){
   rows.forEach(r=>cnt[r.st]=(cnt[r.st]||0)+1);
   const pct=rows.length?Math.round((rows.length-nu.length)*100/rows.length):0;
   let h=head();
-  if(me&&PROOF.includes(me.st))h+=`<div class="alert"><span>📎 Bạn đang ${esc(me.st)}. Hãy gửi minh chứng cho trực ban.</span><button class="sm" onclick="proof()">Gửi qua Zalo</button></div>`;
-  if(['tb','ch','ad'].includes(d.role)&&nu.length)h+=`<div class="alert"><span>⏳ ${nu.length} người chưa cập nhật trạng thái.</span><button class="sm" onclick="nudge()">Nhắc qua Zalo</button></div>`;
-  if(d.role==='ad'&&S.locked.length)h+=`<div class="alert"><span>🔒 ${S.locked.length} tài khoản đang bị khóa: ${S.locked.map(o=>esc(o.code)).join(', ')}</span><button class="sm" onclick="viewAdmin()">Mở khóa</button></div>`;
-  if(me)h+=`<div class="card"><h2>⚡ Cập nhật nhanh trạng thái của bạn</h2><div class="qg">${ST.map(s=>`<button class="q ${me.st===s?'on':''}" style="--c:${col(s)}" onclick="quickSet('${s}')"><span>${IC[s]}</span>${s}</button>`).join('')}</div>
-  <div class="mut" style="margin-top:8px">📍 ${me.area?esc(me.area):'Chưa chọn địa bàn'} · <a href="#" onclick="edit('${esc(me.code)}');return false">Đổi địa bàn</a></div></div>`;
-  h+=`<div class="card pg"><div><b>Đã cập nhật ${rows.length-nu.length}/${rows.length} người</b><div class="mut">Ngày trực ${fmt(d.day)}${d.next?' · Ca kế tiếp của bạn '+fmt(d.next):''}</div></div><div class="ring" style="--p:${pct}"><i>${pct}%</i></div></div>`;
-  h+=`<div class="sc">${Object.keys(cnt).map(k=>`<button class="tl ${f===k?'on':''}" style="--c:${col(k)}" onclick="setF('${k}')"><span class="ti">${IC[k]||'❔'}</span><b>${esc(k)}</b><span class="n">${cnt[k]} người</span></button>`).join('')}</div>`;
+  if(me&&PROOF.includes(me.st))h+=`<div class="alert"><span>Bạn đang ${esc(me.st)}. Hãy gửi minh chứng cho trực ban.</span><button class="sm" onclick="proof()">Gửi qua Zalo</button></div>`;
+  if((['tb','ch','ad'].includes(d.role)||d.kind==='TR')&&nu.length)h+=`<div class="alert"><span>${nu.length} người chưa cập nhật trạng thái.</span><button class="sm" onclick="nudge()">Nhắc qua Zalo</button></div>`;
+  if(d.role==='ad'&&S.locked.length)h+=`<div class="alert"><span>${S.locked.length} tài khoản đang bị khóa: ${S.locked.map(o=>esc(o.code)).join(', ')}</span><button class="sm" onclick="viewAdmin()">Mở khóa</button></div>`;
+  if(me)h+=`<div class="card"><h2>Cập nhật nhanh trạng thái của bạn</h2><div class="qg">${ST.map(s=>`<button class="q ${me.st===s?'on':''}" style="--c:${col(s)}" onclick="quickSet('${s}')"><i class="dot"></i>${s}</button>`).join('')}</div>
+  <div class="mut" style="margin-top:8px">Địa bàn: ${me.area?esc(me.area):'chưa chọn'} · <a href="#" onclick="edit('${esc(me.code)}');return false">Đổi địa bàn</a></div></div>`;
+  h+=`<div class="card pg"><div><b>Đã cập nhật ${rows.length-nu.length}/${rows.length} người</b><div class="mut">Ngày trực ${fmt(d.day)}${d.next?' · Ca kế tiếp của bạn '+fmt(d.next):''}</div></div>${gauge(rows,rows.length-nu.length)}</div>`;
+  h+=`<div class="sc">${Object.keys(cnt).map(k=>`<button class="tl ${f===k?'on':''}" style="--c:${col(k)}" onclick="setF('${k}')"><b class="cn">${cnt[k]}</b><span class="n">${esc(k)}</span></button>`).join('')}</div>`;
   h+=`<div class="seg"><span class="mut">Nhóm theo:</span>${[['duty','Nhiệm vụ'],['area','Địa bàn'],['st','Trạng thái']].map(([k,t])=>`<button class="${S.group===k?'on':''}" onclick="setG('${k}')">${t}</button>`).join('')}${f?`<button class="sm" onclick="setF('')">Bỏ lọc: ${esc(f)} ✕</button>`:''}</div>`;
   const list=rows.filter(r=>!f||r.st===f),gk=r=>S.group==='area'?(r.area||'Chưa ghi địa bàn'):S.group==='st'?r.st:DUTY[r.duty],g={};
   list.forEach(r=>(g[gk(r)]=g[gk(r)]||[]).push(r));
-  h+=rows.length?Object.keys(g).map(k=>`<div class="gh">${S.group==='st'?(IC[k]||'')+' ':''}${esc(k)}<span>${g[k].length} người</span></div>`+g[k].map(item).join('')).join('')
+  h+=rows.length?Object.keys(g).map(k=>`<div class="gh">${esc(k)}<span>${g[k].length} người</span></div>`+g[k].map(item).join('')).join('')
     :`<div class="card"><p class="mut">Hôm nay chưa có lịch trực. Quản trị cần nhập lịch ở mục Quản trị.</p></div>`;
-  if(d.log&&d.log.length)h+=`<div class="card"><h2>🕘 Hoạt động gần đây</h2>${d.log.map(l=>`<div class="row"><span>${esc(l.what)}</span><span class="mut">${when(l.at)}</span></div>`).join('')}</div>`;
+  if(d.log&&d.log.length)h+=`<div class="card"><h2>Hoạt động gần đây</h2>${d.log.map(l=>`<div class="row"><span>${esc(l.what)}</span><span class="mut">${when(l.at)}</span></div>`).join('')}</div>`;
   app.innerHTML=h;
 }
 function edit(code){
@@ -212,7 +262,7 @@ function proof(){
   const d=S.data,me=d.rows.find(r=>r.code===d.code);if(!me)return;
   const tb=d.rows.filter(r=>r.duty==='TB'&&r.code!==d.code).map(r=>r.label).join(', ')||'trực ban';
   const msg=`[Báo trực ${fmt(d.day)}] ${me.label} (${me.code}): ${me.st}${me.area?' - '+me.area:''}. Gửi ${tb}, minh chứng đính kèm.`;
-  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>📎 Gửi minh chứng cho trực ban</h2>
+  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>Gửi minh chứng cho trực ban</h2>
   <p class="mut">Bạn đang <b>${esc(me.st)}</b>. Chụp hoặc chọn ảnh giấy mời, giấy giới thiệu, quyết định rồi gửi qua Zalo cho: <b>${esc(tb)}</b>.</p>
   <label>Ảnh minh chứng<input id="pf" type="file" accept="image/*" multiple></label>
   <label>Nội dung gửi<textarea id="pm" rows="3">${esc(msg)}</textarea></label>
@@ -231,6 +281,37 @@ async function nudge(){
   if(navigator.share){try{await navigator.share({text:msg});return}catch(e){if(e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(msg);toast('Đã chép lời nhắc, dán vào nhóm Zalo')}catch(e){toast('Không chép được, hãy tự soạn lời nhắc')}
 }
+
+/* ---- Trưởng CA: xem tổng quan bất kỳ ngày nào (chỉ xem) ---- */
+function itemRO(r,fut){
+  const st=r.st||NU;
+  return `<div class="item" style="--c:${fut?'#6b7280':col(st)}"><div class="av">${esc(ini(r.label))}</div>
+  <div class="mid"><b>${esc(r.label)}</b><div class="meta"><span class="dt d${esc(r.duty)}">${DUTY[r.duty]||''}</span><span class="mut">${esc(r.code)}</span></div>
+  ${r.area?`<div class="area">${esc(r.area)}</div>`:''}</div>
+  ${fut?'':`<div class="r"><span class="st"><i class="dot"></i>${esc(st)}</span><span class="mut">${when(r.at)}</span></div>`}</div>`;
+}
+async function viewOverview(day){
+  S.view='ov';
+  const r=await rpc('tr_overview',{...auth(),p_day:day||S.ovDay||null});
+  if(!r.ok){toast(r.msg);S.view='board';return}
+  S.ovDay=r.day;
+  const fut=r.day>r.today,shift=n=>{const t=new Date(r.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10)};
+  const done=r.rows.filter(x=>x.st).length,g={};
+  r.rows.forEach(x=>(g[x.duty]=g[x.duty]||[]).push(x));
+  let h=head();
+  h+=`<div class="card"><div class="pg"><button class="sec sm" onclick="viewOverview('${shift(-1)}')">◀ Hôm trước</button>
+  <div style="text-align:center"><b>Ngày trực ${fmt(r.day)}</b><div class="mut">${r.day===r.today?'Hôm nay':fut?'Sắp tới':'Đã qua'} · 07:00 đến 07:00 hôm sau</div></div>
+  <button class="sec sm" onclick="viewOverview('${shift(1)}')">Hôm sau ▶</button></div>
+  <label>Chọn ngày<input type="date" value="${esc(r.day)}" onchange="this.value&&viewOverview(this.value)"></label></div>`;
+  if(!r.rows.length)h+=`<div class="card"><p class="mut">Ngày này chưa có lịch trực.</p></div>`;
+  else{
+    h+=`<div class="card"><b>${r.rows.length} người có ca</b>${fut?'':` · đã cập nhật ${done}/${r.rows.length}`}</div>`;
+    ['CH','TB','TC'].filter(k=>g[k]).forEach(k=>{h+=`<div class="gh">${DUTY[k]}<span>${g[k].length} người</span></div>`+g[k].map(x=>itemRO(x,fut)).join('')});
+  }
+  if(r.off.length)h+=`<div class="card"><h2>Không có ca ngày này (${r.off.length})</h2>${r.off.map(o=>`<div class="row"><span>${esc(o.label)}</span><span class="mut">${esc(o.code)}</span></div>`).join('')}</div>`;
+  if(r.log.length)h+=`<div class="card"><h2>Hoạt động trong ngày</h2>${r.log.map(l=>`<div class="row"><span>${esc(l.what)}</span><span class="mut">${when(l.at)}</span></div>`).join('')}</div>`;
+  app.innerHTML=h;
+}
 /* ---- Quản trị ---- */
 async function viewAdmin(){
   S.view='admin';
@@ -239,15 +320,14 @@ async function viewAdmin(){
   const ar=await rpc('get_areas',auth());if(ar.ok){S.areas=ar.areas;S.areasOk=true}
   S.locked=r.officers.filter(o=>o.locked);
   const opt=(v,t)=>`<option value="${v}">${t}</option>`;
-  app.innerHTML=head()+`${S.locked.length?`<div class="alert"><span>🔒 Tài khoản đang bị khóa: ${S.locked.map(o=>`<b>${esc(o.code)}</b> ${esc(o.label)}`).join(' · ')}</span><span class="act">${S.locked.map(o=>`<button class="sm" onclick="resetPin('${esc(o.code)}')">Mở khóa ${esc(o.code)}</button>`).join('')}</span></div>`:''}
+  app.innerHTML=head()+`${S.locked.length?`<div class="alert"><span>Tài khoản đang bị khóa: ${S.locked.map(o=>`<b>${esc(o.code)}</b> ${esc(o.label)}`).join(' · ')}</span><span class="act">${S.locked.map(o=>`<button class="sm" onclick="resetPin('${esc(o.code)}')">Mở khóa ${esc(o.code)}</button>`).join('')}</span></div>`:''}
   <div class="card"><h2>Danh sách cán bộ (${r.officers.length})</h2>`+
-  r.officers.map(o=>`<div class="row"><div><b>${esc(o.code)}</b> ${esc(o.label)}<div class="mut">${o.kind}${o.team?' · Ca '+o.team:''}${o.active?'':' · Đã ngừng'}${o.locked?' · ĐANG KHÓA':''}${o.must_change?' · Chưa đổi PIN':''}</div></div>
+  r.officers.map(o=>`<div class="row"><div><b>${esc(o.code)}</b> ${esc(o.label)}<div class="mut">${KIND[o.kind]||o.kind}${o.active?'':' · Đã ngừng'}${o.locked?' · ĐANG KHÓA':''}${o.must_change?' · Chưa đổi PIN':''}</div></div>
   <div class="act"><button class="sec" onclick='fillOff(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Sửa</button><button class="sec" onclick="resetPin('${esc(o.code)}')">Đặt lại PIN</button></div></div>`).join('')+`</div>
   <div class="card"><h2>Thêm hoặc sửa cán bộ</h2>
   <label>Mã (ví dụ CB07)<input id="oc" autocapitalize="characters"></label>
   <label>Tên hiển thị<input id="ol"></label>
-  <label>Loại<select id="ok">${opt('CB','CB: Cán bộ')+opt('CH','CH: Chỉ huy')+opt('QT','QT: Quản trị')}</select></label>
-  <label>Ca mặc định<select id="ot">${opt('','Không có')+opt('A','Ca A')+opt('B','Ca B')+opt('C','Ca C')}</select></label>
+  <label>Loại<select id="ok">${opt('CB','CB: Cán bộ')+opt('CH','CH: Chỉ huy')+opt('TR','TR: Trưởng CA (xem toàn bộ)')+opt('QT','QT: Quản trị')}</select></label>
   <label><input type="checkbox" id="oa" checked>Đang hoạt động</label>
   <p class="mut">Mã mới sẽ được cấp PIN tạm ngẫu nhiên, hiện một lần duy nhất.</p>
   <button onclick="saveOff()">Lưu cán bộ</button></div>
@@ -256,18 +336,18 @@ async function viewAdmin(){
   <textarea id="ar" rows="6">${esc(S.areas.join('\n'))}</textarea>
   <p class="err" id="are"></p><button onclick="saveAreas()">Lưu danh sách địa bàn</button></div>
   <div class="card"><h2>Nhập lịch trực</h2>
-  <p class="mut">Mỗi dòng một người: <code>ngày,ca,mã,nhiệm vụ</code>. Ví dụ <code>2026-11-14,A,CB06,TB</code>. Nhiệm vụ: CH (chỉ huy), TB (trực ban), TC (trực chiến). Ngày nào có trong dữ liệu sẽ được thay mới hoàn toàn.</p>
-  <textarea id="im" rows="8" placeholder="2026-11-14,A,CB01,CH"></textarea>
+  <p class="mut">Mỗi dòng một người: <code>ngày,mã,nhiệm vụ</code>. Ví dụ <code>2026-11-14,CB06,TB</code>. Nhiệm vụ: CH (chỉ huy), TB (trực ban), TC (trực chiến). Lịch tính theo từng ngày, không có tổ cố định. Khi có người đổi trực, chỉ cần nhập lại đúng ngày đó với danh sách mới: ngày nào có trong dữ liệu sẽ được thay mới hoàn toàn.</p>
+  <textarea id="im" rows="8" placeholder="2026-11-14,CH01,CH"></textarea>
   <p class="err" id="ie"></p><button onclick="doImport()">Nhập lịch</button></div>`;
 }
-function fillOff(o){$('#oc').value=o.code;$('#ol').value=o.label;$('#ok').value=o.kind;$('#ot').value=o.team||'';$('#oa').checked=o.active;$('#oc').scrollIntoView({behavior:'smooth'})}
+function fillOff(o){$('#oc').value=o.code;$('#ol').value=o.label;$('#ok').value=o.kind;$('#oa').checked=o.active;$('#oc').scrollIntoView({behavior:'smooth'})}
 function pinBox(title,code,pin){
   $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${esc(title)} ${esc(code)}</h2><div class="pin">${esc(pin)}</div><p class="mut">Ghi lại và gửi riêng cho cán bộ. PIN này chỉ hiện một lần, người dùng sẽ phải đổi ngay khi đăng nhập.</p><button onclick="closeM()">Đã ghi lại</button></div></div>`;
 }
 async function saveOff(){
   const code=$('#oc').value.trim().toUpperCase();
   if(!code||!$('#ol').value.trim())return toast('Cần nhập mã và tên');
-  const r=await rpc('admin_save_officer',{...auth(),o_code:code,o_label:$('#ol').value.trim(),o_kind:$('#ok').value,o_team:$('#ot').value,o_active:$('#oa').checked});
+  const r=await rpc('admin_save_officer',{...auth(),o_code:code,o_label:$('#ol').value.trim(),o_kind:$('#ok').value,o_team:'',o_active:$('#oa').checked});
   if(!r.ok)return toast(r.msg);
   if(r.pin)pinBox('PIN tạm của',code,r.pin);else toast('Đã lưu');
   viewAdmin();
@@ -283,8 +363,10 @@ async function doImport(){
   $('#im').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach((l,i)=>{
     const p=l.split(/[,;\t]/).map(x=>x.trim());
     if(i===0&&!/^\d{4}-\d{2}-\d{2}$/.test(p[0]))return;
-    if(p.length<4||!/^\d{4}-\d{2}-\d{2}$/.test(p[0])||!['A','B','C'].includes(p[1].toUpperCase())||!['CH','TB','TC'].includes(p[3].toUpperCase()))bad=bad||'Dòng sai: '+l;
-    else rows.push({day:p[0],team:p[1],code:p[2],duty:p[3]});
+    if(p.length===4)p.splice(1,1);
+    const day=p[0],code=(p[1]||'').toUpperCase(),duty=(p[2]||'').toUpperCase();
+    if(p.length!==3||!/^\d{4}-\d{2}-\d{2}$/.test(day)||!code||!['CH','TB','TC'].includes(duty))bad=bad||'Dòng sai: '+l;
+    else rows.push({day,team:TEAM0,code,duty});
   });
   if(bad)return $('#ie').textContent=bad;
   if(!rows.length)return $('#ie').textContent='Chưa có dòng nào';

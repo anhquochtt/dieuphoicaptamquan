@@ -26,15 +26,12 @@
   --primary-orange: #FF6B00;
   --primary-navy: #1B2559;
   --primary-blue: #2563EB;
-  --accent-teal: #0D9488;
-  --accent-purple: #7C3AED;
   --sh-card: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
   --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
-  margin:0;
-  padding:0;
+  margin:0;padding:0;
   color:var(--text-primary);
   font:14px/1.5 var(--font-main);
   background-color:var(--bg);
@@ -61,7 +58,6 @@ main{
   }
 }
 
-/* Typography & General */
 h1{font-size:1.4rem;font-weight:800;margin:0 0 4px;color:var(--text-primary);letter-spacing:-0.02em}
 h2{font-size:1.05rem;font-weight:700;margin:0 0 12px;color:var(--text-primary);letter-spacing:-0.01em}
 .mut{color:var(--text-secondary);font-size:.82rem}
@@ -101,7 +97,6 @@ input,select,textarea{
 }
 input:focus,select:focus,textarea:focus{border-color:var(--primary-orange)}
 
-/* Cards UI based on design */
 .card{
   background:var(--card-bg);
   border-radius:24px;
@@ -112,7 +107,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary-orange)}
 }
 .act{display:flex;gap:8px;flex-wrap:wrap}
 
-/* Header UI */
 .hd-bar{
   display:flex;
   justify-content:space-between;
@@ -120,7 +114,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary-orange)}
   margin-bottom:16px;
   padding:4px 2px;
 }
-.hd-time{font-size:.8rem;font-weight:700;color:var(--text-primary)}
 .hd-user-tag{
   display:flex;
   align-items:center;
@@ -158,7 +151,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary-orange)}
 }
 .ib:hover{color:var(--text-primary);background:#F8FAFC}
 
-/* Navigation Tabs */
 nav{
   display:flex;
   background:#E2E8F0;
@@ -182,7 +174,6 @@ nav button.active{
   box-shadow:var(--sh-sm);
 }
 
-/* Stat Banner Hero */
 .hero-stat{
   text-align:center;
   padding:10px 0 16px;
@@ -193,11 +184,6 @@ nav button.active{
   letter-spacing:-0.03em;
   color:var(--text-primary);
   line-height:1.1;
-}
-.hero-stat .sub{
-  font-size:.82rem;
-  color:var(--text-secondary);
-  margin-top:4px;
 }
 .badge-pill{
   display:inline-flex;
@@ -213,7 +199,6 @@ nav button.active{
   border:1px solid var(--border-dark);
 }
 
-/* Donut Chart Component */
 .donut-box{
   display:flex;
   flex-direction:column;
@@ -231,7 +216,6 @@ nav button.active{
 .donut-box .center-val b{font-size:1.8rem;font-weight:800;display:block;line-height:1}
 .donut-box .center-val span{font-size:.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase}
 
-/* Stat Cards Row */
 .stat-cards-grid{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
@@ -241,7 +225,7 @@ nav button.active{
 .sc-item{
   background:#F8FAFC;
   border-radius:16px;
-  padding:12px 10px;
+  padding:10px 8px;
   text-align:center;
   border:1px solid var(--border);
   cursor:pointer;
@@ -253,33 +237,30 @@ nav button.active{
   box-shadow:0 4px 12px rgba(255,107,0,0.12);
 }
 .sc-item .num{font-size:1.1rem;font-weight:800;color:var(--text-primary)}
-.sc-item .lbl{font-size:.7rem;color:var(--text-secondary);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-item .lbl{font-size:.68rem;color:var(--text-secondary);font-weight:600;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sc-item .bar-indicator{height:3px;border-radius:99px;margin-top:6px;width:100%}
 
-/* Quick Actions Grid */
 .qg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .q{
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  padding:12px 8px;
+  padding:12px 6px;
   border-radius:16px;
   border:1px solid var(--border-dark);
   background:#FFF;
   color:var(--text-primary);
   font:600 .75rem var(--font-main);
   text-align:center;
-  gap:6px;
+  gap:4px;
 }
 .q.on{
   border-color:var(--primary-orange);
   background:#FFF7ED;
   color:var(--primary-orange);
 }
-.dot-sm{width:8px;height:8px;border-radius:50%;display:inline-block}
 
-/* Segmented Buttons Filter */
 .seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:12px 0}
 .seg button{
   background:#FFF;
@@ -296,7 +277,6 @@ nav button.active{
   border-color:var(--primary-navy);
 }
 
-/* User Items List */
 .gh{
   font-size:.82rem;
   font-weight:700;
@@ -340,21 +320,19 @@ nav button.active{
 .st-badge{
   display:inline-flex;
   align-items:center;
-  gap:5px;
+  gap:4px;
   font-size:.75rem;
   font-weight:700;
   padding:4px 10px;
   border-radius:99px;
 }
 
-/* Modals & Toasts */
 .ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:99}
 .ov .card{width:100%;max-width:380px;margin:0}
 .pin{font:800 2.4rem var(--font-main);letter-spacing:.25em;text-align:center;margin:12px 0;color:var(--primary-orange)}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--primary-navy);color:#FFF;padding:10px 20px;border-radius:99px;display:none;z-index:100;font-size:.85rem;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.2)}
 .alert{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px;padding:12px 14px;font-size:.82rem;font-weight:600;border-radius:16px;background:#FFF7ED;color:#C2410C;border:1px solid #FFEDD5}
 
-/* Login Screen */
 .lg{padding:40px 10px 20px;text-align:center}
 .lg .logo-icon{width:64px;height:64px;background:var(--primary-orange);color:#FFF;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 10px 25px rgba(255,107,0,0.3)}
 .lg h1{font-size:1.6rem;margin-bottom:6px}
@@ -370,7 +348,7 @@ const ST=['Sẵn sàng','Trực ban','Tuần tra','Tiếp công dân','Giải qu
 const DUTY={CH:'Chỉ huy',TB:'Trực ban',TC:'Trực chiến'};
 const KIND={CB:'Cán bộ',CH:'Chỉ huy',TR:'Trưởng CA',QT:'Quản trị'};
 const TEAM0='A';
-let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:''};
+let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',swapRequests:[]};
 
 const $=s=>document.querySelector(s), app=$('#app');
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -378,23 +356,31 @@ const fmt=d=>d?d.split('-').reverse().join('/'):'';
 const when=a=>a?new Date(a).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit'}):'';
 
 const SCOL={
-  'Sẵn sàng':'#10B981',
-  'Trực ban':'#0D9488',
-  'Tuần tra':'#2563EB',
-  'Tiếp công dân':'#7C3AED',
-  'Giải quyết vụ việc':'#EA580C',
-  'Công tác khác':'#DB2777',
-  'Nghỉ phép/bù':'#D97706',
-  'Ốm':'#EF4444',
-  'Học tập/công tác':'#6366F1',
-  'Chưa cập nhật':'#94A3B8'
+  'Sẵn sàng':'#10B981','Trực ban':'#0D9488','Tuần tra':'#2563EB','Tiếp công dân':'#7C3AED',
+  'Giải quyết vụ việc':'#EA580C','Công tác khác':'#DB2777','Nghỉ phép/bù':'#D97706',
+  'Ốm':'#EF4444','Học tập/công tác':'#6366F1','Chưa cập nhật':'#94A3B8'
 };
+
+const svg=(p,w)=>`<svg viewBox="0 0 24 24" width="${w||16}" height="${w||16}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+
+const SICON={
+  'Sẵn sàng': svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'),
+  'Trực ban': svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>'),
+  'Tuần tra': svg('<rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>'),
+  'Tiếp công dân': svg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+  'Giải quyết vụ việc': svg('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  'Công tác khác': svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'),
+  'Nghỉ phép/bù': svg('<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.7 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>'),
+  'Ốm': svg('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),
+  'Học tập/công tác': svg('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+  'Chưa cập nhật': svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>')
+};
+
 const NU='Chưa cập nhật',PROOF=['Công tác khác','Học tập/công tác'];
 const col=s=>SCOL[s]||'#64748B';
+const icon=s=>SICON[s]||SICON[NU];
 
-const svg=(p,w)=>`<svg viewBox="0 0 24 24" width="${w||18}" height="${w||18}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const nowT=()=>new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
-
 setInterval(()=>{const e=$('#clk');if(e)e.textContent=nowT()},1000);
 
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500)}
@@ -410,16 +396,14 @@ async function rpc(fn,a){
 }
 const auth=()=>({p_code:S.code,p_pin:S.pin});
 
-/* UI Donut Generator based on design image */
 function renderDonut(done, total){
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  const dashoffset = 283 - (283 * pct) / 100;
+  const dashoffset = 264 - (264 * done / Math.max(total, 1));
   return `
     <div class="donut-box">
       <svg width="140" height="140" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="42" fill="none" stroke="#F1F5F9" stroke-width="12" />
         <circle cx="50" cy="50" r="42" fill="none" stroke="#FF6B00" stroke-width="12"
-          stroke-dasharray="264" stroke-dashoffset="${264 - (264 * done / Math.max(total, 1))}"
+          stroke-dasharray="264" stroke-dashoffset="${dashoffset}"
           stroke-linecap="round" transform="rotate(-90 50 50)"/>
       </svg>
       <div class="center-val">
@@ -430,7 +414,6 @@ function renderDonut(done, total){
   `;
 }
 
-/* Đăng nhập */
 function viewLogin(msg){
   app.innerHTML=`<div class="lg">
     <div class="logo-icon">${svg('<path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>',32)}</div>
@@ -456,12 +439,11 @@ async function doLogin(){
 
 function logout(){
   clearInterval(S.timer);
-  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:''};
+  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',swapRequests:[]};
   closeM();
   viewLogin();
 }
 
-/* Đổi PIN */
 function viewChange(msg){
   const first=S.me&&S.me.must_change;
   app.innerHTML=`<div class="card" style="margin-top:40px">
@@ -487,7 +469,6 @@ async function doChange(){
   S.pin=a;S.me.must_change=false;toast('Đã đổi PIN');load();
 }
 
-/* Load Data */
 async function load(){
   const r=await rpc('board',auth());
   if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
@@ -552,7 +533,7 @@ function item(r){
       </div>
       <div style="text-align:right">
         <div class="st-badge" style="background:${col(r.st)}15;color:${col(r.st)}">
-          <span class="dot-sm" style="background:${col(r.st)}"></span>${esc(r.st)}
+          ${icon(r.st)} ${esc(r.st)}
         </div>
         <div class="mut" style="font-size:.7rem;margin-top:2px">${when(r.at)}</div>
         ${can?`<button class="sm pill sec" style="margin-top:4px" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}
@@ -568,17 +549,25 @@ function viewBoard(){
   rows.forEach(r=>cnt[r.st]=(cnt[r.st]||0)+1);
   const doneCount = rows.length - nu.length;
 
-  let h = renderHeader();
-  h += renderNav();
+  let h = renderHeader() + renderNav();
 
   if(me && PROOF.includes(me.st)){
     h += `<div class="alert"><span>Bạn đang ${esc(me.st)}. Gửi minh chứng cho trực ban.</span><button class="sm pill" onclick="proof()">Gửi Zalo</button></div>`;
   }
+  
+  // Trực ban chỉ xem thông báo các ca đổi trực đã xác nhận (không có nút duyệt)
+  const pendingSwaps = S.swapRequests.filter(s=>s.status==='pending');
+  if(d.role==='tb' && pendingSwaps.length > 0){
+    h += `<div class="alert" style="background:#EFF6FF;color:#1E40AF;border-color:#DBEAFE">
+      <span>Có <b>${pendingSwaps.length}</b> ca đổi trực đã xác nhận (chờ Chỉ huy duyệt).</span>
+      <button class="sm pill" style="background:#2563EB;color:#FFF" onclick="openSwapApprovals()">Xem danh sách</button>
+    </div>`;
+  }
+
   if((['tb','ch','ad'].includes(d.role)||d.kind==='TR')&&nu.length){
     h += `<div class="alert"><span>${nu.length} cán bộ chưa khai báo.</span><button class="sm pill" onclick="nudge()">Nhắc Zalo</button></div>`;
   }
 
-  // Hero Stat UI according to Image Design
   h += `<div class="card" style="padding-bottom:12px">
     <div class="hero-stat">
       <div class="mut" style="font-size:.78rem;font-weight:700;letter-spacing:0.05em">BẢNG QUÂN SỐ TỔNG THỂ</div>
@@ -591,21 +580,23 @@ function viewBoard(){
       ${Object.keys(cnt).slice(0,6).map(k=>`
         <div class="sc-item ${f===k?'on':''}" onclick="setF('${k}')">
           <div class="num">${cnt[k]}</div>
-          <div class="lbl">${esc(k)}</div>
+          <div class="lbl">${icon(k)} ${esc(k)}</div>
           <div class="bar-indicator" style="background:${col(k)}"></div>
         </div>
       `).join('')}
     </div>
   </div>`;
 
-  // Quick Action Box for the current logged-in user
   if(me){
     h += `<div class="card">
-      <h2>Cập nhật nhanh trạng thái</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h2>Cập nhật trạng thái</h2>
+        <button class="sec sm pill" onclick="openSwapModal()">Đổi trực với đồng nghiệp</button>
+      </div>
       <div class="qg">
         ${ST.map(s=>`
           <button class="q ${me.st===s?'on':''}" onclick="quickSet('${s}')">
-            <span class="dot-sm" style="background:${col(s)}"></span>
+            <span style="color:${col(s)}">${icon(s)}</span>
             ${s}
           </button>
         `).join('')}
@@ -617,7 +608,6 @@ function viewBoard(){
     </div>`;
   }
 
-  // List & Grouping
   h += `<div class="seg">
     <span class="mut" style="align-self:center;margin-right:4px">Nhóm:</span>
     ${[['duty','Nhiệm vụ'],['area','Địa bàn'],['st','Trạng thái']].map(([k,t])=>`
@@ -637,6 +627,95 @@ function viewBoard(){
   `).join('') : `<div class="card"><p class="mut">Hôm nay chưa có lịch trực.</p></div>`;
 
   app.innerHTML = h;
+}
+
+function openSwapModal(){
+  const d=S.data, others=d.rows.filter(r=>r.code!==d.code);
+  $('#modal').innerHTML=`<div class="ov"><div class="card">
+    <h2>Đề nghị đổi trực ca</h2>
+    <p class="mut">Chọn đồng nghiệp bạn muốn đổi ca trực trong ngày hôm nay (${fmt(d.day)}).</p>
+    
+    <label class="mut" style="margin-top:10px;display:block">Đổi với cán bộ</label>
+    <select id="sw_target">
+      ${others.map(o=>`<option value="${o.code}">${esc(o.label)} (${DUTY[o.duty]||o.duty})</option>`).join('')}
+    </select>
+
+    <label class="mut" style="margin-top:10px;display:block">Lý do đổi trực</label>
+    <input id="sw_reason" placeholder="Ví dụ: Có việc gia đình đột xuất">
+
+    <div class="act" style="margin-top:16px">
+      <button style="flex:1" onclick="submitSwapRequest()">Gửi yêu cầu cho B</button>
+      <button class="sec" onclick="closeM()">Hủy</button>
+    </div>
+  </div></div>`;
+}
+
+function submitSwapRequest(){
+  const targetCode=$('#sw_target').value, reason=$('#sw_reason').value.trim();
+  const targetObj=S.data.rows.find(r=>r.code===targetCode);
+  const meObj=S.data.rows.find(r=>r.code===S.data.code);
+  
+  if(!reason)return toast('Vui lòng nhập lý do đổi trực');
+
+  S.swapRequests.push({
+    id: Date.now(),
+    day: S.data.day,
+    fromCode: S.data.code,
+    fromName: meObj.label,
+    toCode: targetCode,
+    toName: targetObj.label,
+    reason: reason,
+    status: 'waiting_b'
+  });
+
+  closeM();
+  toast('Đã gửi yêu cầu đổi trực cho đồng nghiệp xác nhận.');
+  checkPendingForMe();
+}
+
+function checkPendingForMe(){
+  const waitingForMe = S.swapRequests.find(s=>s.toCode===S.data.code && s.status==='waiting_b');
+  if(waitingForMe){
+    $('#modal').innerHTML=`<div class="ov"><div class="card">
+      <h2>Xác nhận đổi trực</h2>
+      <p>Đồng chí <b>${esc(waitingForMe.fromName)}</b> muốn đổi ca trực với bạn hôm nay.</p>
+      <p class="mut">Lý do: "${esc(waitingForMe.reason)}"</p>
+      <div class="act" style="margin-top:16px">
+        <button style="flex:1" onclick="confirmSwapByB(${waitingForMe.id}, true)">Đồng ý nhận ca</button>
+        <button class="sec" onclick="confirmSwapByB(${waitingForMe.id}, false)">Từ chối</button>
+      </div>
+    </div></div>`;
+  }
+}
+
+function confirmSwapByB(id, agree){
+  const req = S.swapRequests.find(s=>s.id===id);
+  if(!req) return;
+  if(!agree){
+    req.status = 'rejected';
+    closeM();
+    toast('Đã từ chối yêu cầu đổi trực.');
+    return;
+  }
+  req.status = 'pending';
+  closeM();
+  toast('Đã xác nhận! Thông tin đã chuyển đến Trực ban.');
+}
+
+function openSwapApprovals(){
+  const pending = S.swapRequests.filter(s=>s.status==='pending');
+  $('#modal').innerHTML=`<div class="ov"><div class="card" style="max-width:400px">
+    <h2>Thông tin đổi trực (Chờ Chỉ huy)</h2>
+    ${pending.length===0?'<p class="mut">Không có thông tin mới.</p>':''}
+    ${pending.map(p=>`
+      <div style="background:#F8FAFC;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border)">
+        <div><b>${esc(p.fromName)}</b> đổi với <b>${esc(p.toName)}</b></div>
+        <div class="mut" style="font-size:.78rem">Lý do: ${esc(p.reason)}</div>
+        <div class="mut" style="font-size:.72rem;color:var(--primary-blue);margin-top:4px">Đã xác nhận đồng ý · Chờ Chỉ huy quyết định</div>
+      </div>
+    `).join('')}
+    <button class="sec" style="width:100%;margin-top:10px" onclick="closeM()">Đóng</button>
+  </div></div>`;
 }
 
 function edit(code){
@@ -717,7 +796,6 @@ async function nudge(){
   try{await navigator.clipboard.writeText(msg);toast('Đã chép lời nhắc, dán vào nhóm Zalo')}catch(e){toast('Hãy chép lời nhắc vào nhóm')}
 }
 
-/* Xem tổng quan các ngày */
 async function viewOverview(day){
   S.view='ov';
   const r=await rpc('tr_overview',{...auth(),p_day:day||S.ovDay||null});
@@ -747,14 +825,13 @@ async function viewOverview(day){
           <b>${esc(x.label)}</b>
           <div class="meta"><span class="dt">${DUTY[x.duty]||''}</span><span class="mut">${esc(x.code)}</span></div>
         </div>
-        <div class="st-badge" style="background:${col(x.st||NU)}15;color:${col(x.st||NU)}">${esc(x.st||NU)}</div>
+        <div class="st-badge" style="background:${col(x.st||NU)}15;color:${col(x.st||NU)}">${icon(x.st||NU)} ${esc(x.st||NU)}</div>
       </div>
     `).join('');
   }
   app.innerHTML = h;
 }
 
-/* Quản trị */
 async function viewAdmin(){
   S.view='admin';
   const r=await rpc('admin_list',auth());
@@ -767,22 +844,25 @@ async function viewAdmin(){
     <div class="card">
       <h2>Danh sách cán bộ (${r.officers.length})</h2>
       ${r.officers.map(o=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
           <div>
             <b>${esc(o.code)} - ${esc(o.label)}</b>
-            <div class="mut" style="font-size:.75rem">${KIND[o.kind]||o.kind}${o.locked?' · KHÓA':''}</div>
+            <div class="mut" style="font-size:.75rem">${KIND[o.kind]||o.kind}${o.active?'':' · Ngừng'}${o.locked?' · KHÓA':''}</div>
           </div>
-          <button class="sec sm" onclick="resetPin('${esc(o.code)}')">Reset PIN</button>
+          <div class="act">
+            <button class="sec sm" onclick='editOfficerModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Sửa</button>
+            <button class="sec sm" onclick="resetPin('${esc(o.code)}')">PIN</button>
+          </div>
         </div>
       `).join('')}
     </div>
 
     <div class="card">
-      <h2>Thêm / Sửa cán bộ</h2>
+      <h2>Thêm cán bộ mới</h2>
       <label class="mut">Mã cán bộ</label>
-      <input id="oc" autocapitalize="characters" placeholder="CB07">
+      <input id="oc" autocapitalize="characters" placeholder="Ví dụ: CB07">
       <label class="mut" style="margin-top:8px;display:block">Tên cán bộ</label>
-      <input id="ol" placeholder="Nguyễn Văn A">
+      <input id="ol" placeholder="Ví dụ: Nguyễn Văn A">
       <label class="mut" style="margin-top:8px;display:block">Loại tài khoản</label>
       <select id="ok">
         <option value="CB">CB: Cán bộ</option>
@@ -790,7 +870,7 @@ async function viewAdmin(){
         <option value="TR">TR: Trưởng CA</option>
         <option value="QT">QT: Quản trị</option>
       </select>
-      <button style="width:100%;margin-top:14px" onclick="saveOff()">Lưu thông tin</button>
+      <button style="width:100%;margin-top:14px" onclick="saveOff()">Tạo cán bộ mới</button>
     </div>
 
     <div class="card">
@@ -808,6 +888,46 @@ async function viewAdmin(){
     </div>
   `;
   app.innerHTML = h;
+}
+
+function editOfficerModal(o){
+  $('#modal').innerHTML=`<div class="ov"><div class="card">
+    <h2>Sửa thông tin: ${esc(o.code)}</h2>
+    <label class="mut">Mã cán bộ (Cố định)</label>
+    <input value="${esc(o.code)}" disabled style="background:#F1F5F9;color:var(--text-secondary)">
+    
+    <label class="mut" style="margin-top:10px;display:block">Tên hiển thị</label>
+    <input id="e_ol" value="${esc(o.label)}">
+    
+    <label class="mut" style="margin-top:10px;display:block">Loại tài khoản</label>
+    <select id="e_ok">
+      <option value="CB" ${o.kind==='CB'?'selected':''}>CB: Cán bộ</option>
+      <option value="CH" ${o.kind==='CH'?'selected':''}>CH: Chỉ huy</option>
+      <option value="TR" ${o.kind==='TR'?'selected':''}>TR: Trưởng CA</option>
+      <option value="QT" ${o.kind==='QT'?'selected':''}>QT: Quản trị</option>
+    </select>
+
+    <label class="mut" style="margin-top:10px;display:block">Trạng thái hoạt động</label>
+    <select id="e_oa">
+      <option value="true" ${o.active?'selected':''}>Đang hoạt động</option>
+      <option value="false" ${!o.active?'selected':''}>Ngừng hoạt động</option>
+    </select>
+    
+    <div class="act" style="margin-top:16px">
+      <button style="flex:1" onclick="saveEditOfficer('${esc(o.code)}')">Lưu thay đổi</button>
+      <button class="sec" onclick="closeM()">Hủy</button>
+    </div>
+  </div></div>`;
+}
+
+async function saveEditOfficer(code){
+  const label=$('#e_ol').value.trim(), kind=$('#e_ok').value, active=$('#e_oa').value==='true';
+  if(!label)return toast('Vui lòng nhập tên');
+  const r=await rpc('admin_save_officer',{...auth(),o_code:code,o_label:label,o_kind:kind,o_team:'',o_active:active});
+  if(!r.ok)return toast(r.msg);
+  closeM();
+  toast('Đã cập nhật cán bộ '+code);
+  viewAdmin();
 }
 
 async function saveOff(){

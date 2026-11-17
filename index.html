@@ -345,16 +345,18 @@ nav button{padding:8px 4px;font-size:.78rem;white-space:nowrap}
 .lg p{color:var(--text-secondary);font-size:.88rem;margin-bottom:24px}
 .lg input{margin-bottom:12px;text-align:center;font-size:1rem;letter-spacing:1px}
 .lg button.cta{width:100%;padding:14px;border-radius:99px;background:var(--primary-orange);font-size:1rem;margin-top:8px;box-shadow:0 8px 20px rgba(255,107,0,0.25)}
+nav{overflow-x:auto;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{flex:1 0 auto;padding:8px 10px}
 </style></head><body>
 <main id="app"></main><div id="modal"></div><div id="toast"></div>
 <script>
 const API='https://ihrihhpovslcywzjtjtx.supabase.co/rest/v1/rpc/';
 const KEY='sb_publishable_a_pTZDIgAbLO4F2_usPJUw_d0dEgNSn';
-const ST=['Sẵn sàng','Trực ban','Tuần tra','Tiếp công dân','Giải quyết vụ việc','Công tác khác','Nghỉ phép/bù','Ốm','Học tập/công tác'];
+const ST=['Tại cơ quan','Sẵn sàng','Tuần tra','Tiếp công dân','Giải quyết vụ việc','Đi cơ sở','Họp/Hội nghị','Làm việc với đối tượng','Công tác khác','Nghỉ phép/bù','Ốm','Học tập/công tác'];
+const STE=[ST[0],'Trực ban',...ST.slice(1)];
 const DUTY={CH:'Chỉ huy',TB:'Trực ban',TC:'Trực chiến'};
 const KIND={CB:'Cán bộ',CH:'Chỉ huy',TR:'Trưởng CA',QT:'Quản trị'};
 const TEAM0='A';
-let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[]};
+let S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[],autoTb:{}};
 
 const $=s=>document.querySelector(s), app=$('#app');
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -364,7 +366,7 @@ const when=a=>a?new Date(a).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-dig
 const SCOL={
   'Sẵn sàng':'#10B981','Trực ban':'#0D9488','Tuần tra':'#2563EB','Tiếp công dân':'#7C3AED',
   'Giải quyết vụ việc':'#EA580C','Công tác khác':'#DB2777','Nghỉ phép/bù':'#D97706',
-  'Ốm':'#EF4444','Học tập/công tác':'#6366F1','Chưa cập nhật':'#94A3B8'
+  'Ốm':'#EF4444','Học tập/công tác':'#6366F1','Tại cơ quan':'#0891B2','Đi cơ sở':'#65A30D','Họp/Hội nghị':'#A21CAF','Làm việc với đối tượng':'#475569','Chưa cập nhật':'#94A3B8'
 };
 
 const svg=(p,w)=>`<svg viewBox="0 0 24 24" width="${w||16}" height="${w||16}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -379,6 +381,10 @@ const SICON={
   'Nghỉ phép/bù': svg('<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.7 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>'),
   'Ốm': svg('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),
   'Học tập/công tác': svg('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+  'Tại cơ quan': svg('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>'),
+  'Đi cơ sở': svg('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+  'Họp/Hội nghị': svg('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+  'Làm việc với đối tượng': svg('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
   'Chưa cập nhật': svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>')
 };
 
@@ -446,7 +452,7 @@ async function doLogin(){
 
 function logout(){
   clearInterval(S.timer);
-  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[]};
+  S={code:'',pin:'',me:null,data:null,view:'board',timer:null,areas:[],areasOk:false,filter:'',group:'duty',locked:[],ovDay:'',phones:{},sw:{incoming:[],mine:[],notices:[],can_cancel:false},seen:{},q:'',mySched:[],people:[],autoTb:{}};
   closeM();
   viewLogin();
 }
@@ -481,12 +487,19 @@ async function load(){
   if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
   if(!S.areasOk){const a=await rpc('get_areas',auth());if(a.ok){S.areas=a.areas;S.areasOk=true}}
   if(r.kind==='TR'){const o=await rpc('tr_overview',{...auth(),p_day:null});if(o.ok)r.log=o.log.slice(0,12)}
-  const [sb,ph]=await Promise.all([rpc('swap_board',auth()),(S.phonesDay!==r.day||S.phonesStale)?rpc('get_phones',auth()):null]);
+  const [sb,ph,ob]=await Promise.all([rpc('swap_board',auth()),(S.phonesDay!==r.day||S.phonesStale)?rpc('get_phones',auth()):null,rpc('office_board',auth())]);
+  S.off=ob&&ob.ok?ob:null;
   S.sw=sb.ok?sb:{incoming:[],mine:[],notices:[],can_cancel:false};
   if(ph&&ph.ok){S.phones=ph.phones||{};S.phonesDay=r.day;S.phonesStale=0}
+  const mt=r.rows.find(x=>x.code===r.code);
+  if(mt&&mt.duty==='TB'&&mt.st===NU&&!S.autoTb[r.day]){
+    S.autoTb[r.day]=1;
+    const a=await rpc('set_status',{...auth(),p_target:r.code,p_st:'Trực ban',p_area:''});
+    if(a.ok){mt.st='Trực ban';mt.at=new Date().toISOString();toast('Đã tự ghi: Trực ban')}
+  }
   S.data=r;if(r.role==='ad'){const a=await rpc('admin_list',auth());if(a.ok)S.locked=a.officers.filter(o=>o.locked)}
-  const vf={board:viewBoard,ov:()=>viewOverview(S.ovDay),mine:viewMine,stats:viewStats}[S.view];if(vf)vf();showIncoming();
-  clearInterval(S.timer);S.timer=setInterval(()=>{if(S.view==='board'&&!$('#modal').innerHTML&&document.activeElement.id!=='q')load()},30000);
+  const vf={board:viewBoard,ov:()=>viewOverview(S.ovDay),mine:viewMine,stats:viewStats,org:viewOrg}[S.view];if(vf)vf();showIncoming();
+  clearInterval(S.timer);S.timer=setInterval(()=>{if((S.view==='board'||S.view==='org')&&!$('#modal').innerHTML&&document.activeElement.id!=='q')load()},30000);
 }
 
 const ini=l=>((String(l||'?').trim().split(/\s+/).pop())||'?').charAt(0).toUpperCase();
@@ -508,10 +521,11 @@ function renderHeader(){
   `;
 }
 
-function go(v){S.view=v;({board:viewBoard,ov:()=>viewOverview(),mine:viewMine,stats:viewStats,admin:viewAdmin})[v]()}
+function go(v){S.view=v;({board:viewBoard,ov:()=>viewOverview(),mine:viewMine,stats:viewStats,admin:viewAdmin,org:viewOrg})[v]()}
 function renderNav(){
   const d=S.data,t=[['board',d.kind==='TR'?'Hôm nay':'Quân số']];
   if(d.kind==='TR')t.push(['ov','Các ngày']);
+  if(d.role==='tb'||['CH','TR','QT'].includes(d.kind))t.push(['org','Toàn cơ quan']);
   if(d.kind!=='QT')t.push(['mine','Lịch của tôi']);
   if(['CH','TR','QT'].includes(d.kind))t.push(['stats','Thống kê']);
   if(d.role==='ad')t.push(['admin','Quản trị']);
@@ -561,7 +575,7 @@ function viewBoard(){
     h += `<div class="alert"><span>Bạn đang ${esc(me.st)}. Gửi minh chứng cho trực ban.</span><button class="sm pill" onclick="proof()">Gửi Zalo</button></div>`;
   }
   
-  h += swCards();
+  h += swCards()+offAlert();
 
   if((['tb','ch','ad'].includes(d.role)||d.kind==='TR')&&rows.length){
     h += nu.length
@@ -604,11 +618,12 @@ function viewBoard(){
       </div>
       <div class="mut" style="margin-top:12px;text-align:center">
         Địa bàn hiện tại: <b>${me.area?esc(me.area):'Chưa chọn'}</b> · 
-        <a href="#" onclick="edit('${esc(me.code)}');return false">Đổi địa bàn</a>
+        <a href="#" onclick="edit('${esc(me.code)}');return false">Đổi địa bàn</a>${d.role==='tb'?(me.st==='Trực ban'?'<div style="margin-top:6px">Trực ban: tự ghi khi bạn đăng nhập.</div>':'<div style="margin-top:6px"><a href="#" onclick="quickSet(\'Trực ban\');return false">Quay lại Trực ban</a></div>'):''}
       </div>
     </div>`;
   }
 
+  h += offSelf();
   h += `<div class="seg">
     <span class="mut" style="align-self:center;margin-right:4px">Nhóm:</span>
     ${[['duty','Nhiệm vụ'],['area','Địa bàn'],['st','Trạng thái']].map(([k,t])=>`
@@ -782,7 +797,7 @@ function edit(code){
   $('#modal').innerHTML=`<div class="ov"><div class="card">
     <h2>${esc(r.label)}</h2>
     <label class="mut">Trạng thái</label>
-    <select id="es">${ST.map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select>
+    <select id="es">${STE.map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select>
     ${areaField(r.area)}
     <p class="err" id="em"></p>
     <div class="act" style="margin-top:14px">
@@ -899,7 +914,7 @@ async function viewAdmin(){
   const r=await rpc('admin_list',auth());
   if(!r.ok){toast(r.msg);S.view='board';return}
   const ar=await rpc('get_areas',auth());if(ar.ok){S.areas=ar.areas;S.areasOk=true}
-  S.locked=r.officers.filter(o=>o.locked);
+  S.locked=r.officers.filter(o=>o.locked);S.cands=r.officers.filter(o=>o.active&&['CB','CH'].includes(o.kind));S.trs=r.officers.filter(o=>o.active&&o.kind==='TR');S.fp=[];
   const ph=await rpc('get_phones',auth());S.phones=(ph.ok&&ph.phones)?ph.phones:{};
   
   let h = renderHeader() + renderNav();
@@ -948,6 +963,21 @@ async function viewAdmin(){
       <textarea id="phn" rows="5"></textarea>
       <p class="err" id="phe"></p>
       <button style="width:100%;margin-top:10px" onclick="savePhones()">Lưu số điện thoại</button>
+    </div>
+
+    <div class="card">
+      <h2>Lịch 100% quân số</h2>
+      <p class="mut">Chỉ chọn 2 trực ban mỗi ngày. Trực chiến là tất cả cán bộ còn lại. Lệnh này thay mới toàn bộ lịch của các ngày được chọn.</p>
+      ${S.trs.length?`<p class="mut">Chỉ huy mỗi ngày: <b>${S.trs.map(o=>esc(o.label)).join(', ')}</b></p>`:'<p class="err">Chưa có tài khoản Trưởng CA (loại TR) đang hoạt động. Hãy tạo trước khi lưu lịch.</p>'}
+      <label class="mut">Từ ngày</label><input type="date" id="fp_from" value="${S.data.day}">
+      <label class="mut" style="margin-top:8px;display:block">Đến ngày</label><input type="date" id="fp_to">
+      <button class="sec" style="width:100%;margin-top:10px" onclick="fpBuild()">Tạo bảng</button>
+      <div id="fp_tab"></div>
+      <label class="mut" style="margin-top:10px;display:block">Hoặc dán, mỗi dòng: ngày,mã trực ban 1,mã trực ban 2</label>
+      <textarea id="fp_paste" rows="3" placeholder="2026-11-20,CB06,CB07"></textarea>
+      <button class="sec" style="width:100%;margin-top:8px" onclick="fpPaste()">Điền vào bảng</button>
+      <p class="err" id="fpe"></p>
+      <button style="width:100%" onclick="fpSave()">Lưu lịch 100%</button>
     </div>
 
     <div class="card">
@@ -1064,6 +1094,117 @@ async function doImport(){
   const r=await rpc('admin_import',{...auth(),p_rows:rows});
   if(!r.ok)return $('#ie').textContent=r.msg;
   $('#ie').textContent='';toast('Đã nhập '+r.n+' dòng lịch');$('#im').value='';
+}
+
+// ===== Toàn cơ quan, người ngoài ca, lịch 100% quân số =====
+const DOW=['CN','T2','T3','T4','T5','T6','T7'];
+const offHrs=()=>!!(S.off&&S.off.in_hours);
+function offAlert(){
+  if(!S.off||!S.off.all||!offHrs())return '';
+  const n=S.off.rows.filter(r=>!r.on_duty&&!r.st).length;
+  return n?`<div class="alert"><span>Toàn cơ quan: ${n} người ngoài ca chưa khai báo.</span><button class="sm pill" onclick="go('org')">Xem</button></div>`:'';
+}
+function offSelf(){
+  const d=S.data,m=S.off&&S.off.rows.find(r=>r.code===d.code&&!r.on_duty);
+  if(!m||d.rows.some(r=>r.code===d.code))return '';
+  return `<div class="card"><h2>Hôm nay bạn không có ca trực</h2>
+    <p class="mut" style="margin:-6px 0 10px">Cập nhật bạn đang làm gì. Không cần gửi minh chứng.</p>
+    <div class="qg">${ST.map(s=>`<button class="q ${m.st===s?'on':''}" onclick="orgQuick('${s}')"><span style="color:${col(s)}">${icon(s)}</span>${s}</button>`).join('')}</div>
+    <div class="mut" style="margin-top:12px;text-align:center">Địa bàn hiện tại: <b>${m.area?esc(m.area):'Chưa chọn'}</b> · <a href="#" onclick="editOrg('${esc(m.code)}');return false">Đổi địa bàn</a></div></div>`;
+}
+function orgItem(r){
+  const d=S.data,counted=r.on_duty||offHrs(),st=r.st||NU,tel=r.code!==d.code?(S.phones[r.code]||''):'',can=r.code===d.code||d.role==='tb';
+  return `<div class="item ${!r.st&&counted?'nu':''}" data-s="${esc(norm(r.label+' '+r.code))}">
+    <div class="av" style="background:${col(st)}">${esc(ini(r.label))}</div>
+    <div class="mid"><b>${esc(r.label)} ${r.code===d.code?'<span class="me">Bạn</span>':''}</b>
+      <div class="meta"><span class="dt">${r.on_duty?(DUTY[r.duty]||''):'Không trực'}</span><span class="mut">${esc(r.code)}</span></div>
+      ${r.area?`<div class="area">📍 ${esc(r.area)}</div>`:''}</div>
+    <div style="text-align:right">
+      <div class="st-badge" style="background:${col(st)}15;color:${col(st)}">${icon(st)} ${esc(st)}</div>
+      <div class="mut" style="font-size:.7rem;margin-top:2px">${when(r.at)}</div>
+      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" aria-label="Zalo ${esc(r.label)}">Z</a>`:''}${can?`<button class="sm pill sec" onclick="${r.on_duty?'edit':'editOrg'}('${esc(r.code)}')">Cập nhật</button>`:''}</div>
+    </div></div>`;
+}
+function viewOrg(){
+  S.view='org';
+  const o=S.off;let h=renderHeader()+renderNav();
+  if(!o||!o.all){app.innerHTML=h+`<div class="card"><p class="mut">Bạn chưa xem được toàn cơ quan. Nếu vừa được phân công trực ban hôm nay, hãy bấm Làm mới. Nếu chưa thấy, có thể chưa chạy SQL đợt 1 trên Supabase.</p></div>`;return}
+  const hrs=o.in_hours,rows=o.rows,counted=rows.filter(r=>r.on_duty||hrs),need=counted.filter(r=>!r.st);
+  h+=`<div class="card"><h2>Toàn cơ quan: ${fmt(o.day)}</h2>
+    <div style="font-size:1.6rem;font-weight:800">${counted.length-need.length}/${counted.length} <span class="mut">đã khai báo</span></div>
+    <p class="mut" style="margin:6px 0 0">${hrs?'Đang trong giờ hành chính.':'Ngoài giờ hành chính (07:00 đến 11:30, 13:30 đến 17:00, thứ 2 đến thứ 6): người không trực chưa bị tính là chưa khai báo.'}</p></div>`;
+  if(need.length)h+=`<div class="alert"><span>${need.length} người chưa khai báo.</span><button class="sm pill" onclick="offNudge()">Nhắc qua Zalo</button></div>`;
+  h+=`<input type="search" id="q" placeholder="Tìm theo tên hoặc mã" value="${esc(S.q)}" oninput="setQ(this.value)" style="margin:0 0 8px">`;
+  const G={'Chưa khai báo':[],'Đang có ca trực':[],'Không trực hôm nay':[]};
+  rows.forEach(r=>G[need.includes(r)?'Chưa khai báo':r.on_duty?'Đang có ca trực':'Không trực hôm nay'].push(r));
+  h+=Object.keys(G).filter(k=>G[k].length).map(k=>`<div class="gh"><span>${k}</span><span>${G[k].length} người</span></div>${G[k].map(orgItem).join('')}`).join('')||`<div class="card"><p class="mut">Chưa có cán bộ nào.</p></div>`;
+  app.innerHTML=h;if(S.q)applyQ();
+}
+function offNudge(){
+  const o=S.off,n=o.rows.filter(r=>!r.st&&(r.on_duty||o.in_hours));
+  shareText(`[Nhắc ${fmt(o.day)}] Các đồng chí chưa cập nhật trạng thái: ${n.map(r=>r.label+' ('+r.code+')').join(', ')}. Vui lòng cập nhật trên Bảng điều phối.`,'Đã chép lời nhắc, dán vào Zalo');
+}
+function editOrg(code){
+  const r=S.off.rows.find(x=>x.code===code);
+  $('#modal').innerHTML=`<div class="ov"><div class="card">
+    <h2>${esc(r.label)}</h2><p class="mut">Không có ca trực hôm nay.</p>
+    <label class="mut">Trạng thái</label>
+    <select id="es">${ST.map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select>
+    ${areaField(r.area)}
+    <p class="err" id="em"></p>
+    <div class="act" style="margin-top:14px"><button style="flex:1" onclick="saveOrg('${esc(code)}')">Lưu trạng thái</button><button class="sec" onclick="closeM()">Hủy</button></div>
+  </div></div>`;
+}
+async function saveOrg(code){
+  const r=await rpc('office_set',{...auth(),p_target:code,p_st:$('#es').value,p_area:areaVal()});
+  if(!r.ok){$('#em').textContent=r.msg;return}
+  closeM();toast('Đã lưu trạng thái');load();
+}
+async function orgQuick(s){
+  const m=S.off&&S.off.rows.find(r=>r.code===S.data.code);
+  const r=await rpc('office_set',{...auth(),p_target:S.data.code,p_st:s,p_area:(m&&m.area)||''});
+  if(!r.ok)return toast(r.msg);
+  toast('Đã cập nhật: '+s);load();
+}
+
+function fpRender(){
+  const el=$('#fp_tab');if(!el)return;
+  if(!S.fp||!S.fp.length){el.innerHTML='';return}
+  const opt=v=>'<option value="">(Chọn)</option>'+S.cands.map(o=>`<option value="${esc(o.code)}" ${o.code===v?'selected':''}>${esc(o.label)} (${esc(o.code)})</option>`).join('');
+  el.innerHTML=S.fp.map((x,i)=>`<div style="padding:8px 0;border-top:1px solid var(--border);margin-top:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b>${DOW[new Date(x.day+'T00:00:00Z').getUTCDay()]} ${fmt(x.day)}</b>${i?`<button class="sm pill sec" onclick="fpCopy(${i})">Giống ngày trước</button>`:''}</div>
+    <select onchange="S.fp[${i}].a=this.value">${opt(x.a)}</select><select onchange="S.fp[${i}].b=this.value">${opt(x.b)}</select></div>`).join('');
+}
+function fpBuild(){
+  const f=$('#fp_from').value,t=$('#fp_to').value,e=$('#fpe'),min=S.data.day;
+  if(!f||!t)return e.textContent='Hãy chọn từ ngày và đến ngày';
+  if(t<f)return e.textContent='Ngày kết thúc phải sau ngày bắt đầu';
+  if(f<min)return e.textContent='Không tạo lịch cho ngày đã qua (từ '+fmt(min)+' trở đi)';
+  const L=[],end=new Date(t+'T00:00:00Z');let c=new Date(f+'T00:00:00Z');
+  while(c<=end&&L.length<62){const day=c.toISOString().slice(0,10);L.push((S.fp||[]).find(x=>x.day===day)||{day,a:'',b:''});c.setUTCDate(c.getUTCDate()+1)}
+  e.textContent=c<=end?'Chỉ tạo tối đa 62 ngày mỗi lần, đã lấy 62 ngày đầu':'';
+  S.fp=L;fpRender();
+}
+function fpCopy(i){S.fp[i].a=S.fp[i-1].a;S.fp[i].b=S.fp[i-1].b;fpRender()}
+function fpPaste(){
+  const e=$('#fpe'),L=S.fp||[],ok=c=>S.cands.some(o=>o.code===c);let bad='';
+  $('#fp_paste').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    const p=l.split(/[,;\t]/).map(x=>x.trim()),a=(p[1]||'').toUpperCase(),b=(p[2]||'').toUpperCase();
+    if(p.length!==3||!/^\d{4}-\d{2}-\d{2}$/.test(p[0])||!ok(a)||!ok(b)){bad=bad||'Dòng sai hoặc mã không trực ban được: '+l;return}
+    let x=L.find(y=>y.day===p[0]);if(!x){x={day:p[0]};L.push(x)}
+    x.a=a;x.b=b;
+  });
+  L.sort((a,b)=>a.day<b.day?-1:1);S.fp=L;e.textContent=bad;fpRender();
+}
+async function fpSave(){
+  const e=$('#fpe'),L=S.fp||[];
+  if(!L.length)return e.textContent='Hãy bấm Tạo bảng trước';
+  const x=L.find(y=>!y.a||!y.b||y.a===y.b);
+  if(x)return e.textContent='Ngày '+fmt(x.day)+': hãy chọn đủ 2 người trực ban khác nhau';
+  if(!confirm('Lưu lịch '+L.length+' ngày? Lịch cũ của các ngày này sẽ bị thay mới.'))return;
+  const r=await rpc('admin_import_full',{...auth(),p_days:L.map(y=>({day:y.day,tb:[y.a,y.b]}))});
+  if(!r.ok)return e.textContent=r.msg;
+  S.fp=[];fpRender();e.textContent='';S.phonesStale=1;toast('Đã lưu '+r.days+' ngày, '+r.rows+' dòng lịch');
 }
 
 viewLogin();

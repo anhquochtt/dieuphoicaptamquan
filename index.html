@@ -487,8 +487,8 @@ async function load(){
   if(!r.ok){if(S.data)toast(r.msg);else viewLogin(r.msg);return}
   if(!S.areasOk){const a=await rpc('get_areas',auth());if(a.ok){S.areas=a.areas;S.areasOk=true}}
   if(r.kind==='TR'){const o=await rpc('tr_overview',{...auth(),p_day:null});if(o.ok)r.log=o.log.slice(0,12)}
-  const [sb,ph,ob]=await Promise.all([rpc('swap_board',auth()),(S.phonesDay!==r.day||S.phonesStale)?rpc('get_phones',auth()):null,rpc('office_board',auth())]);
-  S.off=ob&&ob.ok?ob:null;
+  const [sb,ph,ob,tm]=await Promise.all([rpc('swap_board',auth()),(S.phonesDay!==r.day||S.phonesStale)?rpc('get_phones',auth()):null,rpc('office_board',auth()),rpc('team_board',auth())]);
+  S.off=ob&&ob.ok?ob:null;S.team=tm&&tm.ok&&tm.teams.length?tm:null;
   S.sw=sb.ok?sb:{incoming:[],mine:[],notices:[],can_cancel:false};
   if(ph&&ph.ok){S.phones=ph.phones||{};S.phonesDay=r.day;S.phonesStale=0}
   const mt=r.rows.find(x=>x.code===r.code);
@@ -498,8 +498,8 @@ async function load(){
     if(a.ok){mt.st='Trực ban';mt.at=new Date().toISOString();toast('Đã tự ghi: Trực ban')}
   }
   S.data=r;if(r.role==='ad'){const a=await rpc('admin_list',auth());if(a.ok)S.locked=a.officers.filter(o=>o.locked)}
-  const vf={board:viewBoard,ov:()=>viewOverview(S.ovDay),mine:viewMine,stats:viewStats,org:viewOrg}[S.view];if(vf)vf();showIncoming();
-  clearInterval(S.timer);S.timer=setInterval(()=>{if((S.view==='board'||S.view==='org')&&!$('#modal').innerHTML&&document.activeElement.id!=='q')load()},30000);
+  const vf={board:viewBoard,ov:()=>viewOverview(S.ovDay),mine:viewMine,stats:viewStats,org:viewOrg,team:viewTeam}[S.view];if(vf)vf();showIncoming();
+  clearInterval(S.timer);S.timer=setInterval(()=>{if((S.view==='board'||S.view==='org'||S.view==='team')&&!$('#modal').innerHTML&&document.activeElement.id!=='q')load()},30000);
 }
 
 const ini=l=>((String(l||'?').trim().split(/\s+/).pop())||'?').charAt(0).toUpperCase();
@@ -521,11 +521,12 @@ function renderHeader(){
   `;
 }
 
-function go(v){S.view=v;({board:viewBoard,ov:()=>viewOverview(),mine:viewMine,stats:viewStats,admin:viewAdmin,org:viewOrg})[v]()}
+function go(v){S.view=v;({board:viewBoard,ov:()=>viewOverview(),mine:viewMine,stats:viewStats,admin:viewAdmin,org:viewOrg,team:viewTeam})[v]()}
 function renderNav(){
   const d=S.data,t=[['board',d.kind==='TR'?'Hôm nay':'Quân số']];
   if(d.kind==='TR')t.push(['ov','Các ngày']);
   if(d.role==='tb'||['CH','TR','QT'].includes(d.kind))t.push(['org','Toàn cơ quan']);
+  if(S.team)t.push(['team',S.team.my_team?'Tổ của tôi':'Các tổ']);
   if(d.kind!=='QT')t.push(['mine','Lịch của tôi']);
   if(['CH','TR','QT'].includes(d.kind))t.push(['stats','Thống kê']);
   if(d.role==='ad')t.push(['admin','Quản trị']);
@@ -915,6 +916,7 @@ async function viewAdmin(){
   if(!r.ok){toast(r.msg);S.view='board';return}
   const ar=await rpc('get_areas',auth());if(ar.ok){S.areas=ar.areas;S.areasOk=true}
   S.locked=r.officers.filter(o=>o.locked);S.cands=r.officers.filter(o=>o.active&&['CB','CH'].includes(o.kind));S.trs=r.officers.filter(o=>o.active&&o.kind==='TR');S.fp=[];
+  const tmr=await rpc('team_board',auth());S.team=tmr.ok&&tmr.teams.length?tmr:null;
   const ph=await rpc('get_phones',auth());S.phones=(ph.ok&&ph.phones)?ph.phones:{};
   
   let h = renderHeader() + renderNav();
@@ -963,6 +965,15 @@ async function viewAdmin(){
       <textarea id="phn" rows="5"></textarea>
       <p class="err" id="phe"></p>
       <button style="width:100%;margin-top:10px" onclick="savePhones()">Lưu số điện thoại</button>
+    </div>
+
+    <div class="card">
+      <h2>Tổ công tác</h2>
+      <p class="mut">Mỗi dòng một người: <code>MÃ,TÊN TỔ,VAI</code>. VAI là TT (tổ trưởng), TP (tổ phó) hoặc TV (thành viên). Ví dụ: CB07,Tổ tuần tra,TV. Gỡ một người khỏi tổ: <code>MÃ,GỠ</code>. Tên tổ tối đa 30 ký tự, không dùng dấu phẩy. Mỗi tổ 1 tổ trưởng. Chỉ huy và Trưởng CA không xếp vào tổ.</p>
+      ${teamAdmin(r.officers)}
+      <textarea id="tm_in" rows="5" style="margin-top:10px"></textarea>
+      <p class="err" id="tme"></p>
+      <button style="width:100%" onclick="saveTeams()">Lưu danh sách tổ</button>
     </div>
 
     <div class="card">
@@ -1205,6 +1216,108 @@ async function fpSave(){
   const r=await rpc('admin_import_full',{...auth(),p_days:L.map(y=>({day:y.day,tb:[y.a,y.b]}))});
   if(!r.ok)return e.textContent=r.msg;
   S.fp=[];fpRender();e.textContent='';S.phonesStale=1;toast('Đã lưu '+r.days+' ngày, '+r.rows+' dòng lịch');
+}
+
+// ===== Tổ, tổ trưởng, tổ phó =====
+const RLT={TT:'Tổ trưởng',TP:'Tổ phó',TV:'Thành viên'};
+function teamItem(m,tm){
+  const d=S.data,t=S.team,counted=m.on_duty||t.in_hours,st=m.st||NU,tel=m.code!==d.code?(S.phones[m.code]||''):'';
+  return `<div class="item ${!m.st&&counted?'nu':''}" data-s="${esc(norm(m.label+' '+m.code))}">
+    <div class="av" style="background:${col(st)}">${esc(ini(m.label))}</div>
+    <div class="mid"><b>${esc(m.label)} ${m.code===d.code?'<span class="me">Bạn</span>':''}</b>
+      <div class="meta"><span class="dt">${RLT[m.role]}</span>${m.on_duty?`<span class="dt">${DUTY[m.duty]||''}</span>`:''}<span class="mut">${esc(m.code)}</span></div>
+      ${m.area?`<div class="area">📍 ${esc(m.area)}</div>`:''}</div>
+    <div style="text-align:right">
+      <div class="st-badge" style="background:${col(st)}15;color:${col(st)}">${icon(st)} ${esc(st)}</div>
+      <div class="mut" style="font-size:.7rem;margin-top:2px">${when(m.at)}</div>
+      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(m.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" aria-label="Zalo ${esc(m.label)}">Z</a>`:''}${tm.can_manage?`<button class="sm pill sec" onclick="editTeam('${esc(m.code)}')">Cập nhật</button>`:''}</div>
+    </div></div>`;
+}
+function viewTeam(){
+  S.view='team';
+  const t=S.team;let h=renderHeader()+renderNav();
+  if(!t){app.innerHTML=h+`<div class="card"><p class="mut">Bạn chưa thuộc tổ nào. Nếu vừa được xếp tổ, hãy bấm Làm mới. Nếu chưa thấy, có thể chưa chạy SQL đợt 2 trên Supabase.</p></div>`;return}
+  h+=`<input type="search" id="q" placeholder="Tìm theo tên hoặc mã" value="${esc(S.q)}" oninput="setQ(this.value)" style="margin:0 0 8px">`;
+  h+=t.teams.map(tm=>{
+    const cnt=tm.members.filter(m=>m.on_duty||t.in_hours),done=cnt.filter(m=>m.st).length;
+    let s=`<div class="gh"><span>${esc(tm.name)}${tm.mine?' (tổ của bạn)':''}</span><span>${cnt.length?done+'/'+cnt.length+' đã khai':tm.members.length+' người'}</span></div>`;
+    const info=tm.deleg.map(g=>`<div class="mut">Quyền tổ trưởng đang giao cho <b>${esc(g.label)}</b> đến hết ${fmt(g.until)}${tm.can_delegate?` · <a href="#" onclick="revokeDeleg(${tm.id},'${esc(g.code)}');return false">Thu hồi</a>`:''}</div>`).join('')
+      +(tm.can_delegate&&tm.members.some(m=>m.role==='TP')?`<div style="margin-top:6px"><button class="sm pill sec" onclick="openDelegate(${tm.id})">Giao quyền cho tổ phó</button></div>`:'');
+    if(info)s+=`<div class="card" style="padding:12px 14px;margin-bottom:8px">${info}</div>`;
+    return s+tm.members.map(m=>teamItem(m,tm)).join('');
+  }).join('');
+  app.innerHTML=h;if(S.q)applyQ();
+}
+function editTeam(code){
+  let m=null;S.team.teams.forEach(t=>t.members.forEach(x=>{if(x.code===code)m=x}));
+  if(!m)return;
+  $('#modal').innerHTML=`<div class="ov"><div class="card">
+    <h2>${esc(m.label)}</h2><p class="mut">${m.on_duty?'Đang có ca trực hôm nay.':'Không có ca trực hôm nay.'} Bạn đang nhập thay.</p>
+    <label class="mut">Trạng thái</label>
+    <select id="es">${(m.on_duty?STE:ST).map(s=>`<option ${s===m.st?'selected':''}>${s}</option>`).join('')}</select>
+    ${areaField(m.area)}
+    <p class="err" id="em"></p>
+    <div class="act" style="margin-top:14px"><button style="flex:1" onclick="saveTeam('${esc(code)}')">Lưu trạng thái</button><button class="sec" onclick="closeM()">Hủy</button></div>
+  </div></div>`;
+}
+async function saveTeam(code){
+  const r=await rpc('team_set',{...auth(),p_target:code,p_st:$('#es').value,p_area:areaVal()});
+  if(!r.ok){$('#em').textContent=r.msg;return}
+  closeM();toast('Đã lưu trạng thái');load();
+}
+function openDelegate(id){
+  const tm=S.team.teams.find(x=>x.id===id),t0=new Date(S.team.today+'T00:00:00Z');t0.setUTCDate(t0.getUTCDate()+7);
+  $('#modal').innerHTML=`<div class="ov"><div class="card">
+    <h2>Giao quyền tổ trưởng</h2><p class="mut">Tổ ${esc(tm.name)}. Tổ phó được giao sẽ xem và nhập thay cho cả tổ. Hết ngày kết thúc, quyền tự về lại tổ trưởng.</p>
+    <label class="mut">Giao cho</label>
+    <select id="dg_who">${tm.members.filter(m=>m.role==='TP').map(m=>`<option value="${esc(m.code)}">${esc(m.label)} (${esc(m.code)})</option>`).join('')}</select>
+    <label class="mut" style="margin-top:10px;display:block">Đến hết ngày</label>
+    <input type="date" id="dg_to" min="${esc(S.team.today)}" value="${t0.toISOString().slice(0,10)}">
+    <p class="err" id="dge"></p>
+    <div class="act" style="margin-top:14px"><button style="flex:1" onclick="submitDelegate(${id})">Giao quyền</button><button class="sec" onclick="closeM()">Hủy</button></div>
+  </div></div>`;
+}
+async function submitDelegate(id){
+  const to=$('#dg_to').value;
+  if(!to)return $('#dge').textContent='Hãy chọn ngày kết thúc';
+  const r=await rpc('team_delegate',{...auth(),p_team:id,p_deputy:$('#dg_who').value,p_until:to});
+  if(!r.ok)return $('#dge').textContent=r.msg;
+  closeM();toast('Đã giao quyền');load();
+}
+async function revokeDeleg(id,code){
+  if(!confirm('Thu hồi quyền đã giao cho '+code+'?'))return;
+  const r=await rpc('team_revoke',{...auth(),p_team:id,p_deputy:code});
+  if(!r.ok)return toast(r.msg);
+  toast('Đã thu hồi');load();
+}
+
+function teamAdmin(os){
+  const T=(S.team&&S.team.teams)||[],inT=new Set();
+  T.forEach(t=>t.members.forEach(m=>inT.add(m.code)));
+  const un=os.filter(o=>o.active&&o.kind==='CB'&&!inT.has(o.code));
+  return (T.length?T.map(t=>`<div style="padding:8px 0;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center"><b>${esc(t.name)} <span class="mut">(${t.members.length})</span></b><button class="sm pill sec" onclick="renameTeam(${t.id})">Đổi tên</button></div><div class="mut" style="font-size:.78rem">${t.members.map(m=>esc(m.code)+(m.role==='TV'?'':' ('+m.role+')')).join(', ')}</div></div>`).join(''):'<p class="mut">Chưa có tổ nào.</p>')
+    +(un.length?`<p class="mut" style="margin-top:8px">Chưa xếp tổ (${un.length}): ${un.map(o=>esc(o.code)).join(', ')}</p>`:'');
+}
+async function saveTeams(){
+  const rows=[];let bad='';
+  $('#tm_in').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    const p=l.split(/[,;\t]/).map(x=>x.trim()),code=(p[0]||'').toUpperCase();
+    if(p.length===2&&code&&norm(p[1])==='go')rows.push({code,team:'',role:''});
+    else if(p.length===3&&code&&p[1]&&p[1].length<=30&&/^(TT|TP|TV)$/i.test(p[2]))rows.push({code,team:p[1],role:p[2].toUpperCase()});
+    else bad=bad||'Dòng sai: '+l;
+  });
+  if(bad)return $('#tme').textContent=bad;
+  if(!rows.length)return $('#tme').textContent='Chưa có dòng hợp lệ';
+  const r=await rpc('admin_set_teams',{...auth(),p_rows:rows});
+  if(!r.ok)return $('#tme').textContent=r.msg;
+  toast('Đã lưu '+r.n+' dòng');viewAdmin();
+}
+async function renameTeam(id){
+  const t=S.team.teams.find(x=>x.id===id),n=prompt('Tên mới của tổ (tối đa 30 ký tự, không dùng dấu phẩy):',t.name);
+  if(n===null)return;
+  const r=await rpc('admin_rename_team',{...auth(),p_id:id,p_name:n.trim()});
+  if(!r.ok)return toast(r.msg);
+  toast('Đã đổi tên tổ');viewAdmin();
 }
 
 viewLogin();

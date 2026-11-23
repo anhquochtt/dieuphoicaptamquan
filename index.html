@@ -555,7 +555,7 @@ function item(r){
         </div>
         <div class="mut" style="font-size:.7rem;margin-top:2px">${when(r.at)}</div>
         <div class="rowb">
-          ${tel?`<a class="call" href="tel:${esc(tel)}" title="Gọi ${esc(r.label)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" title="Zalo ${esc(r.label)}" aria-label="Zalo ${esc(r.label)}">Z</a>`:''}
+          ${tel?`<a class="call" href="tel:${esc(tel)}" title="Gọi ${esc(r.label)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a>`:''}
           ${can?`<button class="sm pill sec" onclick="edit('${esc(r.code)}')">Cập nhật</button>`:''}
         </div>
       </div>
@@ -573,7 +573,7 @@ function viewBoard(){
   let h = renderHeader() + renderNav();
 
   if(me && PROOF.includes(me.st)){
-    h += `<div class="alert"><span>Bạn đang ${esc(me.st)}. Gửi minh chứng cho trực ban.</span><button class="sm pill" onclick="proof()">Gửi Zalo</button></div>`;
+    h += `<div class="alert"><span>Bạn đang ${esc(me.st)}. Gửi minh chứng cho trực ban.</span><button class="sm pill" onclick="proof()">Gửi Signet</button></div>`;
   }
   
   h += swCards()+offAlert();
@@ -656,13 +656,13 @@ function applyQ(){
 }
 async function shareText(msg,okm){
   if(navigator.share){try{await navigator.share({text:msg});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(msg);toast(okm||'Đã chép, dán vào Zalo')}catch(e){toast('Hãy tự chép nội dung vào Zalo')}
+  try{await navigator.clipboard.writeText(msg);toast(okm||'Đã chép, dán vào Signet')}catch(e){toast('Hãy tự chép nội dung vào Signet')}
 }
 function report(){
   const d=S.data,rows=d.rows,nu=rows.filter(r=>r.st===NU).length;
   let m=`BÁO CÁO QUÂN SỐ TRỰC ${fmt(d.day)} (lúc ${nowT()})\nTổng: ${rows.length} người, chưa khai báo: ${nu}.`;
   ['CH','TB','TC'].forEach(k=>{const L=rows.filter(r=>r.duty===k);if(L.length)m+=`\n${DUTY[k]} (${L.length}):`+L.map(r=>`\n- ${r.label} (${r.code}): ${r.st}${r.area?' - '+r.area:''}`).join('')});
-  shareText(m,'Đã chép báo cáo, dán vào Zalo');
+  shareText(m,'Đã chép báo cáo, dán vào Signet');
 }
 
 const SWST={wait:'Chờ trả lời',done:'Đã đổi',declined:'Bị từ chối',cancelled:'Đã hủy'};
@@ -767,7 +767,7 @@ async function submitSwap(){
     :f.kind==='NC'?`[Đổi trực] ${me} đề nghị ${p.label} nhận ca trực ${fmt(f.day)}. Vui lòng mở Bảng điều phối để trả lời.`
     :`[Đổi trực] ${me} đề nghị đổi ca ${fmt(f.day)} lấy ca ${fmt(f.dayTo)} của ${p.label}. Vui lòng mở Bảng điều phối để trả lời.`;
   S.phonesStale=1;
-  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${f.kind==='DV'?'Đã đổi vai':'Đã gửi yêu cầu'}</h2><p class="mut">${f.kind==='DV'?'Thay đổi có hiệu lực ngay.':'Người nhận sẽ thấy thông báo khi mở ứng dụng.'} Nên nhắn thêm qua Zalo cho chắc.</p><div class="act"><button style="flex:1" onclick="shareText(S.lastMsg)">Báo qua Zalo</button><button class="sec" onclick="closeM()">Đóng</button></div></div></div>`;
+  $('#modal').innerHTML=`<div class="ov"><div class="card"><h2>${f.kind==='DV'?'Đã đổi vai':'Đã gửi yêu cầu'}</h2><p class="mut">${f.kind==='DV'?'Thay đổi có hiệu lực ngay.':'Người nhận sẽ thấy thông báo khi mở ứng dụng.'} Nên nhắn thêm qua Signet cho chắc.</p><div class="act"><button style="flex:1" onclick="shareText(S.lastMsg)">Báo qua Signet</button><button class="sec" onclick="closeM()">Đóng</button></div></div></div>`;
   load();
 }
 
@@ -843,25 +843,25 @@ function proof(){
   const tb=d.rows.filter(r=>r.duty==='TB'&&r.code!==d.code).map(r=>r.label).join(', ')||'trực ban';
   const msg=`[Báo trực ${fmt(d.day)}] ${me.label} (${me.code}): ${me.st}${me.area?' - '+me.area:''}. Gửi ${tb}, minh chứng đính kèm.`;
   $('#modal').innerHTML=`<div class="ov"><div class="card">
-    <h2>Gửi minh chứng Zalo</h2>
+    <h2>Gửi minh chứng qua Signet</h2>
     <p class="mut">Bạn đang <b>${esc(me.st)}</b>. Vui lòng gửi ảnh minh chứng cho: <b>${esc(tb)}</b>.</p>
     <label class="mut">Ảnh đính kèm</label>
     <input id="pf" type="file" accept="image/*" multiple>
     <label class="mut" style="margin-top:10px;display:block">Nội dung</label>
     <textarea id="pm" rows="3">${esc(msg)}</textarea>
     <div class="act" style="margin-top:14px">
-      <button style="flex:1" onclick="sendZalo()">Mở Zalo gửi</button>
+      <button style="flex:1" onclick="sendProof()">Chọn Signet để gửi</button>
       <button class="sec" onclick="closeM()">Đóng</button>
     </div>
   </div></div>`;
 }
 
-async function sendZalo(){
+async function sendProof(){
   const msg=$('#pm').value,files=[...$('#pf').files],data={text:msg};
   if(files.length&&navigator.canShare&&navigator.canShare({files}))data.files=files;
   if(navigator.share){try{await navigator.share(data);closeM();return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(msg);toast('Đã chép nội dung. Mở Zalo dán đính kèm.')}catch(e){toast('Hãy tự chép nội dung vào Zalo')}
-  window.open('https://zalo.me','_blank');
+  try{await navigator.clipboard.writeText(msg);toast('Đã chép nội dung. Mở Signet dán và đính kèm ảnh.')}catch(e){toast('Hãy tự chép nội dung vào Signet')}
+  
 }
 
 async function nudge(){
@@ -871,7 +871,7 @@ async function nudge(){
   let msg=`[Quân số trực ${fmt(d.day)}] Ca trực ${rows.length} người, đã khai báo ${rows.length-nu.length}/${rows.length}.\nTình hình: ${sum}.`;
   if(nu.length)msg+=`\nChưa khai báo (${nu.length}): ${nu.map(r=>r.label+' ('+r.code+')').join(', ')}.\nĐề nghị các đồng chí cập nhật trạng thái trên Bảng điều phối.`;
   if(navigator.share){try{await navigator.share({text:msg});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(msg);toast('Đã chép tin nhắc, dán vào nhóm Zalo')}catch(e){toast('Hãy chép tin nhắc vào nhóm')}
+  try{await navigator.clipboard.writeText(msg);toast('Đã chép tin nhắc, dán vào nhóm Signet')}catch(e){toast('Hãy chép tin nhắc vào nhóm Signet')}
 }
 
 async function viewOverview(day){
@@ -1133,7 +1133,7 @@ function orgItem(r){
     <div style="text-align:right">
       <div class="st-badge" style="background:${col(st)}15;color:${col(st)}">${icon(st)} ${esc(st)}</div>
       <div class="mut" style="font-size:.7rem;margin-top:2px">${when(r.at)}</div>
-      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" aria-label="Zalo ${esc(r.label)}">Z</a>`:''}${can?`<button class="sm pill sec" onclick="${r.on_duty?'edit':'editOrg'}('${esc(r.code)}')">Cập nhật</button>`:''}</div>
+      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(r.label)}">${PHONE}</a>`:''}${can?`<button class="sm pill sec" onclick="${r.on_duty?'edit':'editOrg'}('${esc(r.code)}')">Cập nhật</button>`:''}</div>
     </div></div>`;
 }
 function viewOrg(){
@@ -1144,7 +1144,7 @@ function viewOrg(){
   h+=`<div class="card"><h2>Toàn cơ quan: ${fmt(o.day)}</h2>
     <div style="font-size:1.6rem;font-weight:800">${counted.length-need.length}/${counted.length} <span class="mut">đã khai báo</span></div>
     <p class="mut" style="margin:6px 0 0">${hrs?'Đang trong giờ hành chính.':'Ngoài giờ hành chính (07:00 đến 11:30, 13:30 đến 17:00, thứ 2 đến thứ 6): người không trực chưa bị tính là chưa khai báo.'}</p></div>`;
-  if(need.length)h+=`<div class="alert"><span>${need.length} người chưa khai báo.</span><button class="sm pill" onclick="offNudge()">Nhắc qua Zalo</button></div>`;
+  if(need.length)h+=`<div class="alert"><span>${need.length} người chưa khai báo.</span><button class="sm pill" onclick="offNudge()">Nhắc qua Signet</button></div>`;
   h+=`<input type="search" id="q" placeholder="Tìm theo tên hoặc mã" value="${esc(S.q)}" oninput="setQ(this.value)" style="margin:0 0 8px">`;
   const G={'Chưa khai báo':[],'Đang có ca trực':[],'Không trực hôm nay':[]};
   rows.forEach(r=>G[need.includes(r)?'Chưa khai báo':r.on_duty?'Đang có ca trực':'Không trực hôm nay'].push(r));
@@ -1153,7 +1153,7 @@ function viewOrg(){
 }
 function offNudge(){
   const o=S.off,n=o.rows.filter(r=>!r.st&&(r.on_duty||o.in_hours));
-  shareText(`[Nhắc ${fmt(o.day)}] Các đồng chí chưa cập nhật trạng thái: ${n.map(r=>r.label+' ('+r.code+')').join(', ')}. Vui lòng cập nhật trên Bảng điều phối.`,'Đã chép lời nhắc, dán vào Zalo');
+  shareText(`[Nhắc ${fmt(o.day)}] Các đồng chí chưa cập nhật trạng thái: ${n.map(r=>r.label+' ('+r.code+')').join(', ')}. Vui lòng cập nhật trên Bảng điều phối.`,'Đã chép lời nhắc, dán vào Signet');
 }
 function editOrg(code){
   const r=S.off.rows.find(x=>x.code===code);
@@ -1230,7 +1230,7 @@ function teamItem(m,tm){
     <div style="text-align:right">
       <div class="st-badge" style="background:${col(st)}15;color:${col(st)}">${icon(st)} ${esc(st)}</div>
       <div class="mut" style="font-size:.7rem;margin-top:2px">${when(m.at)}</div>
-      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(m.label)}">${PHONE}</a><a class="call zl" href="https://zalo.me/${esc(tel)}" target="_blank" rel="noopener" aria-label="Zalo ${esc(m.label)}">Z</a>`:''}${tm.can_manage?`<button class="sm pill sec" onclick="editTeam('${esc(m.code)}')">Cập nhật</button>`:''}</div>
+      <div class="rowb">${tel?`<a class="call" href="tel:${esc(tel)}" aria-label="Gọi ${esc(m.label)}">${PHONE}</a>`:''}${tm.can_manage?`<button class="sm pill sec" onclick="editTeam('${esc(m.code)}')">Cập nhật</button>`:''}</div>
     </div></div>`;
 }
 function viewTeam(){
